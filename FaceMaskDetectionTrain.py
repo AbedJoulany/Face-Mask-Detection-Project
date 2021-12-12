@@ -21,13 +21,13 @@ import numpy as np
 import os
 
 INIT_LR = 1e-4
-EPOCHS = 1000
+EPOCHS = 200
 BS = 32
 
-DIRECTORY = r".\dataset"
+DIRECTORY = r".\images"
 CATEGORIES = ["withMask", "WithOutMask"]
 
-# grab the list of images in our dataset directory, then initialize
+# grab the list of images in our images directory, then initialize
 # the list of data (i.e., images) and class images
 print("[INFO] loading images...")
 

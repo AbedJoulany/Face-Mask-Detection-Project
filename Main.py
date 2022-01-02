@@ -57,7 +57,7 @@ class App(QWidget):
         # create a vertical box layout and add the two labels
         vbox = QVBoxLayout()
         vbox.addWidget(self.image_label1)
-        vbox.addWidget(self.image_label2)
+        #vbox.addWidget(self.image_label2)
         vbox.addWidget(self.startButton)
         vbox.addWidget(self.endButton)
 
@@ -75,11 +75,11 @@ class App(QWidget):
 
     def start(self):
         self.thread1.start()
-        self.thread2.start()
+        #self.thread2.start()
 
     def closeEvent(self, event):
         self.thread1.stop()
-        self.thread2.stop()
+        #self.thread2.stop()
         event.accept()
 
     @pyqtSlot(np.ndarray,QLabel)

@@ -24,8 +24,6 @@ BS = 11
 DIRECTORY = r"..\images"
 CATEGORIES = ["withMask", "WithOutMask"]
 
-# grab the list of images in our images directory, then initialize
-# the list of data (i.e., images) and class images
 
 data = []
 labels = []
@@ -91,9 +89,6 @@ opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
 model.compile(loss="binary_crossentropy", optimizer=opt,
 	metrics=["accuracy"])
 
-# train the head of the network
-
-# train the head of the network
 
 H = model.fit(trainX,trainY,epochs=EPOCHS,batch_size=BS)
 

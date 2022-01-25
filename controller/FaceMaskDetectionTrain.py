@@ -14,22 +14,18 @@ from tensorflow.keras.preprocessing.image import load_img
 from tensorflow.keras.utils import to_categorical
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
-from imutils import paths
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 
 INIT_LR = 1e-4
-EPOCHS = 200
-BS = 32
+EPOCHS = 1000
+BS = 11
 
-DIRECTORY = r".\images"
+DIRECTORY = r"..\images"
 CATEGORIES = ["withMask", "WithOutMask"]
 
 # grab the list of images in our images directory, then initialize
 # the list of data (i.e., images) and class images
-print("[INFO] loading images...")
 
 data = []
 labels = []
@@ -90,30 +86,26 @@ for layer in baseModel.layers:
 	layer.trainable = False
 
 # compile our model
-print("[INFO] compiling model...")
+
 opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
 model.compile(loss="binary_crossentropy", optimizer=opt,
 	metrics=["accuracy"])
 
 # train the head of the network
-print("[INFO] training head...")
+
 # train the head of the network
-print("[INFO] training head...")
+
 H = model.fit(trainX,trainY,epochs=EPOCHS,batch_size=BS)
 
 # make predictions on the testing set
-print("[INFO] evaluating network...")
+
 predIdxs = model.predict(testX, batch_size=BS)
 
 # for each image in the testing set we need to find the index of the
 # label with corresponding largest predicted probability
 predIdxs = np.argmax(predIdxs, axis=1)
 
-# show a nicely formatted classification report
-print(classification_report(testY.argmax(axis=1), predIdxs,
-	target_names=lb.classes_))
 
 # serialize the model to disk
-print("[INFO] saving mask detector model...")
 model.save("mask_detector.model", save_format="h5")
 

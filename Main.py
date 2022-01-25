@@ -85,7 +85,7 @@ class App(QWidget):
     @pyqtSlot(np.ndarray,QLabel)
     def update_image(self, cv_img1, image_label):
         """Updates the image_label with a new opencv image"""
-        print("in update img")
+        #print("in update img")
         qt_img1 = self.convert_cv_qt(cv_img1)
         image_label.setPixmap(qt_img1)
 

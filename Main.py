@@ -22,7 +22,8 @@ class Video1Thread(QThread):
         print(self.index)
         while self._run_flag:
             ret1, cv_img1 = cap1.read()
-            frame1 = getFrame(cv_img1)
+            frameId = cap1.get(1)
+            frame1 = getFrame(cv_img1, frameId)
 
             self.change_pixmap_signal.emit(frame1, self.image_label)
         # shut down capture system

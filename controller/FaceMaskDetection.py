@@ -5,10 +5,12 @@ from tensorflow.keras.models import load_model
 import numpy as np
 import imutils
 import cv2
+import math
 
 prototxtPath = r"face_detector\deploy.prototxt"
 weightsPath = r"face_detector\res10_300x300_ssd_iter_140000.caffemodel"
 maskNet = load_model("./controller/mask_detector.model")
+imagesFolder = r"savedImages"
 
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
@@ -48,12 +50,10 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
     return (locs, preds)
 
 
-def getFrame(frame):
+def getFrame(frame,frameId):
     faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
-
     frame = imutils.resize(frame, width=400)
     frame = cv2.flip(frame, 1)
-
     (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
 
     for (box, pred) in zip(locs, preds):
@@ -62,6 +62,12 @@ def getFrame(frame):
 
         label = "No Mask" if mask > withoutMask else "Mask"
         color = (0, 0, 255) if label == "No Mask" else (0, 255, 0)
+
+        if (label == "No Mask") & (frameId % math.floor(30) == 0):
+            f = frame[startY:endY, startX:endX]
+            filename = imagesFolder + "/image_" + str(int(frameId)) + ".jpg"
+            cv2.imwrite(filename, f)
+
         label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
 
         cv2.putText(frame, label, (startX, startY - 10),

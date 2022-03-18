@@ -1,109 +1,243 @@
-import cv2
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QPushButton
-from PyQt5.QtGui import QPixmap
+# IMPORT PACKAGES AND MODULES
+# ///////////////////////////////////////////////////////////////
+from gui.uis.windows.main_window.functions_main_window import *
+import os
 import sys
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QThread
-from controller.FaceMaskDetection import *
+import cv2
+import numpy as np
+from threads.VideoThread import VideoThread
+
+# IMPORT QT CORE
+# ///////////////////////////////////////////////////////////////
+from qt_core import *
+
+# IMPORT SETTINGS
+# ///////////////////////////////////////////////////////////////
+from gui.core.json_settings import Settings
+
+# ///////////////////////////////////////////////////////////////
+# MAIN WINDOW
+from gui.uis.windows.main_window import *
+
+# IMPORT PY ONE DARK WIDGETS
+# ///////////////////////////////////////////////////////////////
+from gui.widgets import *
+
+# ADJUST QT FONT DPI FOR HIGHT SCALE AN 4K MONITOR
+# ///////////////////////////////////////////////////////////////
+os.environ["QT_FONT_DPI"] = "96"
 
 
-class Video1Thread(QThread):
-    change_pixmap_signal = pyqtSignal(np.ndarray, QLabel)
-
-    def __init__(self, index, img_label):
-        super().__init__()
-        self._run_flag = True
-        self.index = index
-        self.image_label = img_label
-
-    def run(self):
-        # capture from web cam
-        cap1 = cv2.VideoCapture(self.index)
-        print(self.index)
-        while self._run_flag:
-            ret1, cv_img1 = cap1.read()
-            frameId = cap1.get(1)
-            frame1 = getFrame(cv_img1, frameId)
-
-            self.change_pixmap_signal.emit(frame1, self.image_label)
-        # shut down capture system
-        cap1.release()
-
-    def stop(self):
-        """Sets run flag to False and waits for thread to finish"""
-        self._run_flag = False
-        # self.wait()
+# IF IS 4K MONITOR ENABLE 'os.environ["QT_SCALE_FACTOR"] = "2"'
 
 
-class App(QWidget):
+
+# MAIN WINDOW
+# ///////////////////////////////////////////////////////////////
+class MainWindow (QMainWindow):
     def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Face Mask Detection UI")
-        self.setFixedWidth(1400)
-        self.setFixedHeight(700)
-        self.disply_width = 700
-        self.display_height = 700
-        # create the label that holds the image
-        self.image_label1 = QLabel(self)
-        self.image_label1.resize(self.disply_width, self.display_height)
+        super ().__init__ ()
 
-        #self.image_label2 = QLabel(self)
-        #self.image_label2.resize(self.disply_width, self.display_height)
-        # create a text label
-        self.startButton = QPushButton('start')
-        self.startButton.clicked.connect(self.start)
-        self.endButton = QPushButton('stop')
-        self.endButton.clicked.connect(self.closeEvent)
+        # SETUP MAIN WINDOw
+        # Load widgets from "gui\uis\main_window\ui_main.py"
+        # ///////////////////////////////////////////////////////////////
+        self.ui = UI_MainWindow ()
+        self.ui.setup_ui (self)
 
-        # create a vertical box layout and add the two labels
-        vbox = QVBoxLayout()
-        vbox.addWidget(self.image_label1)
-        #vbox.addWidget(self.image_label2)
-        vbox.addWidget(self.startButton)
-        vbox.addWidget(self.endButton)
+        # LOAD SETTINGS
+        # ///////////////////////////////////////////////////////////////
+        settings = Settings ()
+        self.settings = settings.items
 
-        # set the vbox layout as the widgets layout
-        self.setLayout(vbox)
+        # SETUP MAIN WINDOW
+        # ///////////////////////////////////////////////////////////////
+        self.hide_grips = True  # Show/Hide resize grips
+        SetupMainWindow.setup_gui (self)
+
+        ###########################################################
 
         # create the video capture thread
-        self.thread1 = Video1Thread(0,self.image_label1)
-        #self.thread2 = Video1Thread(1,self.image_label2)
-        # connect its signal to the update_image slot
-        self.thread1.change_pixmap_signal.connect(self.update_image)
-        #self.thread2.change_pixmap_signal.connect(self.update_image)
-        # start the thread
-        # self.thread.start()
+        self.thread = VideoThread()
 
+
+        # connect its signal to the update_image slot
+        self.thread.change_pixmap_signal.connect(self.update_image)
+        # start the thread
+        self.thread.start()
+        ###########################################################
+
+        # SHOW MAIN WINDOW
+        # ///////////////////////////////////////////////////////////////
+        self.show ()
+    # VIDEO THREAD HANDLING
+    # ///////////////////////////////////////////////////////////////
     def start(self):
-        self.thread1.start()
-        #self.thread2.start()
+        self.thread.start ()
 
     def closeEvent(self, event):
-        self.thread1.stop()
-        #self.thread2.stop()
-        event.accept()
+        self.thread.stop ()
+        event.accept ()
 
-    @pyqtSlot(np.ndarray,QLabel)
-    def update_image(self, cv_img1, image_label):
+    @Slot(np.ndarray)
+    def update_image(self, cv_img):
         """Updates the image_label with a new opencv image"""
-        #print("in update img")
-        qt_img1 = self.convert_cv_qt(cv_img1)
-        image_label.setPixmap(qt_img1)
+        qt_img = self.convert_cv_qt (cv_img)
+        self.ui.load_pages.stream.setPixmap(qt_img)
 
-
-    def convert_cv_qt(self, cv_img1):
+    def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
-        rgb_image1 = cv2.cvtColor(cv_img1, cv2.COLOR_BGR2RGB)
+        rgb_image = cv2.cvtColor (cv_img, cv2.COLOR_BGR2RGB)
+        h, w, ch = rgb_image.shape
+        bytes_per_line = ch * w
+        convert_to_Qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
+        p = convert_to_Qt_format.scaled (self.ui.load_pages.stream.width(),self.ui.load_pages.stream.height(), Qt.KeepAspectRatio)
+        return QPixmap.fromImage (p)
+    # END OF THE VIDEO THREAD SECTION
+    # ///////////////////////////////////////////////////////////////
 
-        h1, w1, ch1 = rgb_image1.shape
-        bytes_per_line1 = ch1 * w1
-        convert_to_Qt_format = QtGui.QImage(rgb_image1.data, w1, h1, bytes_per_line1, QtGui.QImage.Format_RGB888)
-        p = convert_to_Qt_format.scaled(self.disply_width, self.display_height, Qt.KeepAspectRatio)
-        return QPixmap.fromImage(p)
+    # LEFT MENU BTN IS CLICKED
+    # Run function when btn is clicked
+    # Check funtion by object name / btn_id
+    # ///////////////////////////////////////////////////////////////
+    def btn_clicked(self):
+        # GET BT CLICKED
+        btn = SetupMainWindow.setup_btns (self)
+
+        # Remove Selection If Clicked By "btn_close_left_column"
+        if btn.objectName () != "btn_settings":
+            self.ui.left_menu.deselect_all_tab ()
+
+        # Get Title Bar Btn And Reset Active
+        top_settings = MainFunctions.get_title_bar_btn (self, "btn_top_settings")
+        top_settings.set_active (False)
+
+        # LEFT MENU
+        # ///////////////////////////////////////////////////////////////
+
+        # HOME BTN
+        if btn.objectName () == "btn_home":
+            # Select Menu
+            self.ui.left_menu.select_only_one (btn.objectName ())
+
+            # Load Page 1
+            MainFunctions.set_page (self, self.ui.load_pages.page_1)
+
+        # LOAD USER PAGE
+        if btn.objectName () == "btn_add_user":
+            # Select Menu
+            self.ui.left_menu.select_only_one (btn.objectName ())
+
+            # Load Page 3
+            MainFunctions.set_page (self, self.ui.load_pages.page_3)
+
+        # TITLE BAR MENU
+        # ///////////////////////////////////////////////////////////////
+
+        # SETTINGS TITLE BAR
+        if btn.objectName () == "btn_top_settings":
+            # Toogle Active
+            if not MainFunctions.right_column_is_visible (self):
+                btn.set_active (True)
+
+                # Show / Hide
+                MainFunctions.toggle_right_column (self)
+            else:
+                btn.set_active (False)
+
+                # Show / Hide
+                MainFunctions.toggle_right_column (self)
+
+            # Get Left Menu Btn
+            top_settings = MainFunctions.get_left_menu_btn (self, "btn_settings")
+            top_settings.set_active_tab (False)
+
+            # DEBUG
+        print (f"Button {btn.objectName ()}, clicked!")
+
+    # LEFT MENU BTN IS RELEASED
+    # Run function when btn is released
+    # Check funtion by object name / btn_id
+    # ///////////////////////////////////////////////////////////////
+    def btn_released(self):
+        # GET BT CLICKED
+        btn = SetupMainWindow.setup_btns (self)
+
+        # DEBUG
+        print (f"Button {btn.objectName ()}, released!")
+
+    # RESIZE EVENT
+    # ///////////////////////////////////////////////////////////////
+    def resizeEvent(self, event):
+        SetupMainWindow.resize_grips (self)
+
+    # MOUSE CLICK EVENTS
+    # ///////////////////////////////////////////////////////////////
+    def mousePressEvent(self, event):
+        # SET DRAG POS WINDOW
+        self.dragPos = event.globalPos()
 
 
+
+
+# SETTINGS WHEN TO START
+# Set the initial class and also additional parameters of the "QApplication" class
+# ///////////////////////////////////////////////////////////////
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    a = App()
-    a.show()
-    sys.exit(app.exec_())
+    # APPLICATION
+    # ///////////////////////////////////////////////////////////////
+    app = QApplication (sys.argv)
+    app.setWindowIcon (QIcon ("icon.ico"))
+    window = MainWindow ()
+
+    # EXEC APP
+    # ///////////////////////////////////////////////////////////////
+    sys.exit (app.exec ())
+
+    """        # BOTTOM INFORMATION
+            if btn.objectName() == "btn_info":
+                # CHECK IF LEFT COLUMN IS VISIBLE
+                if not MainFunctions.left_column_is_visible(self):
+                    self.ui.left_menu.select_only_one_tab(btn.objectName())
+
+                    # Show / Hide
+                    MainFunctions.toggle_left_column(self)
+                    self.ui.left_menu.select_only_one_tab(btn.objectName())
+                else:
+                    if btn.objectName() == "btn_close_left_column":
+                        self.ui.left_menu.deselect_all_tab()
+                        # Show / Hide
+                        MainFunctions.toggle_left_column(self)
+
+                    self.ui.left_menu.select_only_one_tab(btn.objectName())
+
+                # Change Left Column Menu
+                if btn.objectName() != "btn_close_left_column":
+                    MainFunctions.set_left_column_menu(
+                        self, 
+                        menu = self.ui.left_column.menus.menu_2,
+                        title = "Info tab",
+                        icon_path = Functions.set_svg_icon("icon_info.svg")
+                    )
+
+            # SETTINGS LEFT
+            if btn.objectName() == "btn_settings" or btn.objectName() == "btn_close_left_column":
+                # CHECK IF LEFT COLUMN IS VISIBLE
+                if not MainFunctions.left_column_is_visible(self):
+                    # Show / Hide
+                    MainFunctions.toggle_left_column(self)
+                    self.ui.left_menu.select_only_one_tab(btn.objectName())
+                else:
+                    if btn.objectName() == "btn_close_left_column":
+                        self.ui.left_menu.deselect_all_tab()
+                        # Show / Hide
+                        MainFunctions.toggle_left_column(self)
+                    self.ui.left_menu.select_only_one_tab(btn.objectName())
+
+                # Change Left Column Menu
+                if btn.objectName() != "btn_close_left_column":
+                    MainFunctions.set_left_column_menu(
+                        self, 
+                        menu = self.ui.left_column.menus.menu_1,
+                        title = "Settings Left Column",
+                        icon_path = Functions.set_svg_icon("icon_settings.svg")
+                    )"""

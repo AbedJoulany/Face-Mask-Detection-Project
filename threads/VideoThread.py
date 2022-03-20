@@ -22,7 +22,7 @@ class VideoThread (QThread):
             frame = getFrame(cv_img, frameId)
             self.change_pixmap_signal.emit(frame)
         # shut down capture system
-        cap1.release ()
+        cap.release()
 
     def stop(self):
         """Sets run flag to False and waits for thread to finish"""

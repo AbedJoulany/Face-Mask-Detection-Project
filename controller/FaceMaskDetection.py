@@ -52,8 +52,8 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 
 def getFrame(frame,frameId):
     faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
-    frame = imutils.resize(frame, width=400)
-    frame = cv2.flip(frame, 1)
+    #frame = imutils.resize(frame, width=400)
+    #frame = cv2.flip(frame, 1)
     (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
 
     for (box, pred) in zip(locs, preds):

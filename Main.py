@@ -6,6 +6,7 @@ import sys
 import cv2
 import numpy as np
 from threads.VideoThread import VideoThread
+from threads.PicturesThread import PicturesThread
 
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
@@ -26,10 +27,6 @@ from gui.widgets import *
 # ADJUST QT FONT DPI FOR HIGHT SCALE AN 4K MONITOR
 # ///////////////////////////////////////////////////////////////
 os.environ["QT_FONT_DPI"] = "96"
-
-
-# IF IS 4K MONITOR ENABLE 'os.environ["QT_SCALE_FACTOR"] = "2"'
-
 
 
 # MAIN WINDOW
@@ -57,41 +54,66 @@ class MainWindow (QMainWindow):
         ###########################################################
 
         # create the video capture thread
-        self.thread = VideoThread()
-
+        self.thread = VideoThread ()
+        self.thread1 = PicturesThread ()
 
         # connect its signal to the update_image slot
-        self.thread.change_pixmap_signal.connect(self.update_image)
-        # start the thread
-        self.thread.start()
+        self.thread.change_pixmap_signal.connect (self.update_image)
+        self.thread1.change_pixmap_signal.connect (self.add_image)
         ###########################################################
+
+        # ///////////////////////////////////////////////////////////////
+        self.i = 0
+        self.j = -1
+
+        # ///////////////////////////////////////////////////////////////
 
         # SHOW MAIN WINDOW
         # ///////////////////////////////////////////////////////////////
         self.show ()
+        self.start ()
+
     # VIDEO THREAD HANDLING
     # ///////////////////////////////////////////////////////////////
     def start(self):
         self.thread.start ()
+        self.thread1.start ()
 
     def closeEvent(self, event):
         self.thread.stop ()
         event.accept ()
 
-    @Slot(np.ndarray)
+    @Slot (np.ndarray)
     def update_image(self, cv_img):
         """Updates the image_label with a new opencv image"""
         qt_img = self.convert_cv_qt (cv_img)
-        self.ui.load_pages.stream.setPixmap(qt_img)
+        self.ui.load_pages.stream.setPixmap (qt_img)
+
+    @Slot (np.ndarray)
+    def add_image(self, cv_img):
+        """Updates the image_label with a new opencv image"""
+        qt_img = self.convert_cv_qt (cv_img)
+        object = QLabel ()
+        object.setPixmap (qt_img)
+        self.ui.load_pages.gridLayout_2.addWidget (object, *self.getPos ())
+
+    def getPos(self):
+        self.j += 1
+        if self.j % 3 == 0:
+            self.i += 1
+
+        return (self.i, self.j%3)
 
     def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
         rgb_image = cv2.cvtColor (cv_img, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb_image.shape
         bytes_per_line = ch * w
-        convert_to_Qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
-        p = convert_to_Qt_format.scaled (self.ui.load_pages.stream.width(),self.ui.load_pages.stream.height(), Qt.KeepAspectRatio)
+        convert_to_Qt_format = QImage (rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
+        p = convert_to_Qt_format.scaled (self.ui.load_pages.stream.width (), self.ui.load_pages.stream.height (),
+                                         Qt.KeepAspectRatio)
         return QPixmap.fromImage (p)
+
     # END OF THE VIDEO THREAD SECTION
     # ///////////////////////////////////////////////////////////////
 
@@ -128,7 +150,7 @@ class MainWindow (QMainWindow):
             self.ui.left_menu.select_only_one (btn.objectName ())
 
             # Load Page 3
-            MainFunctions.set_page (self, self.ui.load_pages.page_3)
+            MainFunctions.set_page (self, self.ui.load_pages.page_2)
 
         # TITLE BAR MENU
         # ///////////////////////////////////////////////////////////////
@@ -174,9 +196,7 @@ class MainWindow (QMainWindow):
     # ///////////////////////////////////////////////////////////////
     def mousePressEvent(self, event):
         # SET DRAG POS WINDOW
-        self.dragPos = event.globalPos()
-
-
+        self.dragPos = event.globalPos ()
 
 
 # SETTINGS WHEN TO START

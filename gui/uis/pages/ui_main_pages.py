@@ -11,16 +11,15 @@ from PyQt5.QtWidgets import QLabel as QtLabel
 
 from qt_core import *
 
-
 class Ui_MainPages(object):
     def setupUi(self, MainPages):
         if MainPages.objectName():
             MainPages.setObjectName(u"MainPages")
-        MainPages.resize(1124, 628)
+        MainPages.resize(1125, 628)
         self.main_pages_layout = QVBoxLayout(MainPages)
         self.main_pages_layout.setSpacing(0)
         self.main_pages_layout.setObjectName(u"main_pages_layout")
-        self.main_pages_layout.setContentsMargins(5, 5, 5, 5)
+        self.main_pages_layout.setContentsMargins(0, 0, 0, 0)
         self.pages = QStackedWidget(MainPages)
         self.pages.setObjectName(u"pages")
         self.page_1 = QWidget()
@@ -48,16 +47,28 @@ class Ui_MainPages(object):
 
         self.horizontalLayout_2.addWidget(self.frame_1)
 
-        self.frame_2 = QFrame(self.page_1)
-        self.frame_2.setObjectName(u"frame_2")
-        self.frame_2.setMinimumSize(QSize(240, 600))
-        self.frame_2.setMaximumSize(QSize(16777215, 16777215))
-        self.frame_2.setFrameShape(QFrame.StyledPanel)
-        self.frame_2.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout = QHBoxLayout(self.frame_2)
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.scrollArea = QScrollArea(self.page_1)
+        self.scrollArea.setObjectName(u"scrollArea")
+        self.scrollArea.setMinimumSize(QSize(240, 600))
+        self.scrollArea.setMaximumSize(QSize(240, 16777215))
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollAreaWidgetContents = QWidget()
+        self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 240, 599))
+        self.scrollAreaWidgetContents.setMinimumSize(QSize(240, 0))
+        self.verticalLayout_2 = QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout_2.setSpacing(0)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.right_pic_layout = QVBoxLayout()
+        self.right_pic_layout.setSpacing(0)
+        self.right_pic_layout.setObjectName(u"right_pic_layout")
 
-        self.horizontalLayout_2.addWidget(self.frame_2)
+        self.verticalLayout_2.addLayout(self.right_pic_layout)
+
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+
+        self.horizontalLayout_2.addWidget(self.scrollArea)
 
         self.pages.addWidget(self.page_1)
         self.page_2 = QWidget()
@@ -139,4 +150,3 @@ class Ui_MainPages(object):
         self.stream.setText("")
         self.empty_page_label.setText(QCoreApplication.translate("MainPages", u"Empty Page", None))
     # retranslateUi
-

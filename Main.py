@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 from threads.VideoThread import VideoThread
 from threads.PicturesThread import PicturesThread
+from picBox import *
 
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
@@ -54,8 +55,8 @@ class MainWindow(QMainWindow):
         ###########################################################
 
         # create the video capture thread
-        self.thread = VideoThread()
-        self.thread1 = PicturesThread()
+        self.thread = VideoThread ()
+        self.thread1 = PicturesThread ()
 
         # connect its signal to the update_image slot
         self.thread.change_pixmap_signal.connect(self.update_image)
@@ -94,8 +95,14 @@ class MainWindow(QMainWindow):
         """Updates the image_label with a new opencv image"""
         qt_img = self.convert_cv_qt(cv_img)
         object = QLabel()
+        box = picBox()
+        # scaling the image
+        qt_img = qt_img.scaled(300,300,Qt.KeepAspectRatio)
+        box.setImage(qt_img)
         object.setPixmap(qt_img)
-        self.ui.load_pages.gridLayout_2.addWidget(object, *self.getPos())
+        self.ui.load_pages.gridLayout_2.addWidget(box, *self.getPos())
+        #self.ui.load_pages.right_pic_layout.addWidget(object)
+
 
     def getPos(self):
         self.j += 1

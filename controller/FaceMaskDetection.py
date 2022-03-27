@@ -6,11 +6,32 @@ import numpy as np
 import imutils
 import cv2
 import math
+from controller.simple_facerec import SimpleFacerec
+from threads.RecognitionThread import RecognitionThread
+import threading
+from PIL import Image
 
 prototxtPath = r"face_detector\deploy.prototxt"
 weightsPath = r"face_detector\res10_300x300_ssd_iter_140000.caffemodel"
 maskNet = load_model("./controller/mask_detector.model")
-imagesFolder = r"savedImages"
+FacesImagesFolder = r"savedImages/Faces"
+FullImagesFolder = r"savedImages/FullImages"
+
+#sfr = SimpleFacerec()
+#sfr.load_encoding_images("controller/images/")
+
+counter = 0
+known = RecognitionThread()
+
+
+# def known_faces(frame):
+#     face_locations, face_names = sfr.detect_known_faces(frame)
+#     for face_loc, name in zip(face_locations, face_names):
+#         #y1, x2, y2, x1 = face_loc[0], face_loc[1], face_loc[2], face_loc[3]
+#         # cv2.putText(frame, name, (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+#         # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 200), 4)
+#         facesfilename = FacesImagesFolder + "/image_" + name + ".jpg"
+#         cv2.imwrite(facesfilename, frame)
 
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
@@ -50,23 +71,31 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
     return (locs, preds)
 
 
-def getFrame(frame,frameId):
+def getFrame(frame, frameId):
     faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
-    #frame = imutils.resize(frame, width=400)
-    #frame = cv2.flip(frame, 1)
+    global counter
+    counter += 1
+    frame = imutils.resize(frame, width=400)
+    frame = cv2.flip(frame, 1)
     (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
 
     for (box, pred) in zip(locs, preds):
         (startX, startY, endX, endY) = box
         (mask, withoutMask) = pred
 
+        # x = threading.Thread(target=known_faces(frame[startY:endY, startX:endX]))
+        # x.daemon = True
+
         label = "No Mask" if mask > withoutMask else "Mask"
         color = (0, 0, 255) if label == "No Mask" else (0, 255, 0)
 
-        if (label == "No Mask") & (frameId % math.floor(30) == 0):
-            f = frame[startY:endY, startX:endX]
-            filename = imagesFolder + "/image_" + str(int(frameId)) + ".jpg"
-            cv2.imwrite(filename, f)
+        # if (label == "No Mask") & (frameId % math.floor(30) == 0):
+        # f = frame[startY:endY, startX:endX]
+        if (label == "No Mask") & (counter % math.floor(30) == 0):
+            # known_faces(frame[startY:endY, startX:endX])
+            known.run(frame[startY:endY, startX:endX])
+            fullimagesfilename = FullImagesFolder + "/image_" + str(int(frameId)) + ".jpg"
+            cv2.imwrite(fullimagesfilename, frame)
 
         label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
 

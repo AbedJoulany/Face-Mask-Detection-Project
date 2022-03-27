@@ -1,7 +1,7 @@
 import cv2
 from qt_core import *
 import numpy as np
-from  controller.FaceMaskDetection import getFrame
+from controller.FaceMaskDetection import getFrame
 
 
 class VideoThread (QThread):

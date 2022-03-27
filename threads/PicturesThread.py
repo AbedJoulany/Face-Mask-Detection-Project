@@ -20,9 +20,8 @@ class PicturesThread (QThread):
             print (img)
             cv_img = cv2.imread (imagesFolder + '/' + img, cv2.IMREAD_COLOR)
             self.change_pixmap_signal.emit (cv_img)
-        print ("process finished")
 
     def stop(self):
         """Sets run flag to False and waits for thread to finish"""
         self._run_flag = False
-        self.wait ()
+        self.wait()

@@ -23,20 +23,21 @@ pool = ThreadPoolExecutor (max_workers=3)
 sfr = SimpleFacerec ()
 sfr.load_encoding_images ("controller/images/")
 
+
 counter = 0
 
 
 # known = RecognitionThread()
 
 
-# def known_faces(frame):
-#     face_locations, face_names = sfr.detect_known_faces(frame)
-#     for face_loc, name in zip(face_locations, face_names):
-#         #y1, x2, y2, x1 = face_loc[0], face_loc[1], face_loc[2], face_loc[3]
-#         # cv2.putText(frame, name, (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
-#         # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 200), 4)
-#         facesfilename = FacesImagesFolder + "/image_" + name + ".jpg"
-#         cv2.imwrite(facesfilename, frame)
+def known_faces(frame):
+    face_locations, face_names = sfr.detect_known_faces(frame)
+    for face_loc, name in zip(face_locations, face_names):
+        #y1, x2, y2, x1 = face_loc[0], face_loc[1], face_loc[2], face_loc[3]
+        # cv2.putText(frame, name, (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+        # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 200), 4)
+        facesfilename = FacesImagesFolder + "/image_" + name + ".jpg"
+        cv2.imwrite(facesfilename, frame)
 
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
@@ -97,11 +98,10 @@ def getFrame(frame, frameId, q):
         # if (label == "No Mask") & (frameId % math.floor(30) == 0):
         # f = frame[startY:endY, startX:endX]
         if (label == "No Mask") & (counter % math.floor (30) == 0):
-            # known_faces(frame[startY:endY, startX:endX])
-            # known.run(frame[startY:endY, startX:endX])
             pool.submit (run_rec, frame[startY:endY, startX:endX],q)
             fullimagesfilename = FullImagesFolder + "/image_" + str (int (frameId)) + ".jpg"
             cv2.imwrite (fullimagesfilename, frame)
+
 
         label = "{}: {:.2f}%".format (label, max (mask, withoutMask) * 100)
 

@@ -7,7 +7,6 @@ import imutils
 import cv2
 import math
 from controller.simple_facerec import SimpleFacerec
-from threads.RecognitionThread import RecognitionThread
 from concurrent.futures import ThreadPoolExecutor
 from controller.simple_facerec import SimpleFacerec
 import threading
@@ -77,7 +76,7 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
     return (locs, preds)
 
 
-def getFrame(frame, frameId, q):
+def getFrame(frame, frameId, q, threadLock):
     faceNet = cv2.dnn.readNet (prototxtPath, weightsPath)
     global counter
     counter += 1
@@ -97,8 +96,9 @@ def getFrame(frame, frameId, q):
 
         # if (label == "No Mask") & (frameId % math.floor(30) == 0):
         # f = frame[startY:endY, startX:endX]
-        if (label == "No Mask") & (counter % math.floor (30) == 0):
-            pool.submit (run_rec, frame[startY:endY, startX:endX],q)
+        if label == "No Mask":
+            # making a thread for face recognition
+            pool.submit (run_rec, frame[startY:endY, startX:endX],q,threadLock)
             fullimagesfilename = FullImagesFolder + "/image_" + str (int (frameId)) + ".jpg"
             cv2.imwrite (fullimagesfilename, frame)
 
@@ -112,12 +112,14 @@ def getFrame(frame, frameId, q):
     return frame
 
 
-def run_rec(frame,q):
-    face_locations, face_names = sfr.detect_known_faces (frame)
-    for face_loc, name in zip (face_locations, face_names):
+def run_rec(frame,q, threadLock):
+    #face_locations, face_names = sfr.detect_known_faces (frame)
+    #for face_loc, name in zip (face_locations, face_names):
         # y1, x2, y2, x1 = face_loc[0], face_loc[1], face_loc[2], face_loc[3]
         # cv2.putText(frame, name, (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
         # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 200), 4)
-        facesfilename = FacesImagesFolder + "/image_" + name + ".jpg"
-        cv2.imwrite(facesfilename, frame)
-        q.put(frame)
+    facesfilename = FacesImagesFolder + "/image_" + ".jpg"
+    cv2.imwrite(facesfilename, frame)
+    threadLock.acquire()
+    q.put(frame)
+    threadLock.release()

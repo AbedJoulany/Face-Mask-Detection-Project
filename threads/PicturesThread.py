@@ -9,23 +9,29 @@ imagesFolder = r"savedImages"
 
 
 class PicturesThread (QThread):
-    change_pixmap_signal = Signal (np.ndarray)
+    page_pixmap_signal = Signal (np.ndarray)
+    side_pixmap_signal = Signal (np.ndarray)
 
-    def __init__(self,q):
+    def __init__(self,q,threadLock):
         super ().__init__ ()
         self.q = q
         self._run_flag = True
+        self.threadLock = threadLock
 
     def run(self):
         img_lst = os.listdir (imagesFolder)  # returns list
         for img in img_lst:
             print (img)
             cv_img = cv2.imread (imagesFolder + '/' + img, cv2.IMREAD_COLOR)
-            self.change_pixmap_signal.emit (cv_img)
+            self.page_pixmap_signal.emit (cv_img)
         while self._run_flag:
-            time.sleep(1)
             if not self.q.empty():
-                self.change_pixmap_signal.emit (self.q.get())
+                self.threadLock.acquire ()
+                img = self.q.get()
+                self.page_pixmap_signal.emit(img)
+                self.side_pixmap_signal.emit(img)
+                self.threadLock.release()
+            time.sleep(1)
 
     def stop(self):
         """Sets run flag to False and waits for thread to finish"""

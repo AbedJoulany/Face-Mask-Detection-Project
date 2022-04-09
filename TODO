@@ -1,0 +1,10 @@
+1) add mutex to synchronize the threads
+-> define a mutex and pass it as parameter to the threads
+
+2) on pictures pages show the fullImage , and on the side show the cropped image
+
+3) make a database
+
+4) make the pictures clickable
+
+5) add a page for the chat bot ?

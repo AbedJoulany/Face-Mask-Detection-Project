@@ -9,7 +9,9 @@ from threads.VideoThread import VideoThread
 from threads.PicturesThread import PicturesThread
 from picBox import *
 from queue import Queue
+import threading
 
+threadLock = threading.Lock()
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
 from qt_core import *
@@ -33,35 +35,36 @@ os.environ["QT_FONT_DPI"] = "96"
 
 # MAIN WINDOW
 # ///////////////////////////////////////////////////////////////
-class MainWindow(QMainWindow):
+class MainWindow (QMainWindow):
     def __init__(self):
-        super().__init__()
+        super ().__init__ ()
 
         # SETUP MAIN WINDOw
         # Load widgets from "gui\uis\main_window\ui_main.py"
         # ///////////////////////////////////////////////////////////////
-        self.ui = UI_MainWindow()
-        self.ui.setup_ui(self)
+        self.ui = UI_MainWindow ()
+        self.ui.setup_ui (self)
 
         # LOAD SETTINGS
         # ///////////////////////////////////////////////////////////////
-        settings = Settings()
+        settings = Settings ()
         self.settings = settings.items
 
         # SETUP MAIN WINDOW
         # ///////////////////////////////////////////////////////////////
         self.hide_grips = True  # Show/Hide resize grips
-        SetupMainWindow.setup_gui(self)
+        SetupMainWindow.setup_gui (self)
 
         ###########################################################
         q = Queue ()
         # create the video capture thread
-        self.thread = VideoThread(q)
-        self.thread1 = PicturesThread(q)
+        self.thread = VideoThread(q,threadLock)
+        self.thread1 = PicturesThread(q,threadLock)
 
         # connect its signal to the update_image slot
-        self.thread.change_pixmap_signal.connect(self.update_image)
-        self.thread1.change_pixmap_signal.connect(self.add_image)
+        self.thread.change_pixmap_signal.connect (self.update_image)
+        self.thread1.page_pixmap_signal.connect (self.add_image_to_page)
+        self.thread1.side_pixmap_signal.connect (self.add_image_to_side)
         ###########################################################
 
         # ///////////////////////////////////////////////////////////////
@@ -72,38 +75,48 @@ class MainWindow(QMainWindow):
 
         # SHOW MAIN WINDOW
         # ///////////////////////////////////////////////////////////////
-        self.show()
-        self.start()
+        self.show ()
+        self.start ()
 
     # VIDEO THREAD HANDLING
     # ///////////////////////////////////////////////////////////////
     def start(self):
-        self.thread.start()
-        self.thread1.start()
+        self.thread.start ()
+        self.thread1.start ()
 
     def closeEvent(self, event):
-        self.thread.stop()
-        event.accept()
+        self.thread.stop ()
+        event.accept ()
 
-    @Slot(np.ndarray)
+    @Slot (np.ndarray)
     def update_image(self, cv_img):
         """Updates the image_label with a new opencv image"""
-        qt_img = self.convert_cv_qt(cv_img)
-        self.ui.load_pages.stream.setPixmap(qt_img)
+        qt_img = self.convert_cv_qt (cv_img)
+        self.ui.load_pages.stream.setPixmap (qt_img)
 
-    @Slot(np.ndarray)
-    def add_image(self, cv_img):
+    @Slot (np.ndarray)
+    def add_image_to_page(self, cv_img):
         """Updates the image_label with a new opencv image"""
-        qt_img = self.convert_cv_qt(cv_img)
-        object = QLabel()
-        box = picBox()
+        qt_img = self.convert_cv_qt (cv_img)
+        object = QLabel ()
+        box = picBox ()
         # scaling the image
-        qt_img = qt_img.scaled(300,300,Qt.KeepAspectRatio)
-        box.setImage(qt_img)
-        object.setPixmap(qt_img)
-        self.ui.load_pages.gridLayout_2.addWidget(box, *self.getPos())
-        #self.ui.load_pages.right_pic_layout.addWidget(object)
+        qt_img = qt_img.scaled (300, 300, Qt.KeepAspectRatio)
+        box.setImage (qt_img)
+        object.setPixmap (qt_img)
+        self.ui.load_pages.gridLayout_2.addWidget (box, *self.getPos ())
 
+    @Slot (np.ndarray)
+    def add_image_to_side(self, cv_img):
+        """Updates the image_label with a new opencv image"""
+        qt_img = self.convert_cv_qt (cv_img)
+        object = QLabel ()
+        box = picBox ()
+        # scaling the image
+        qt_img = qt_img.scaled (300, 300, Qt.KeepAspectRatio)
+        box.setImage (qt_img)
+        object.setPixmap (qt_img)
+        self.ui.load_pages.right_pic_layout.addWidget (object)
 
     def getPos(self):
         self.j += 1
@@ -114,13 +127,13 @@ class MainWindow(QMainWindow):
 
     def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
-        rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+        rgb_image = cv2.cvtColor (cv_img, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb_image.shape
         bytes_per_line = ch * w
-        convert_to_qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
-        p = convert_to_qt_format.scaled(self.ui.load_pages.stream.width(), self.ui.load_pages.stream.height(),
-                                        Qt.KeepAspectRatio)
-        return QPixmap.fromImage(p)
+        convert_to_qt_format = QImage (rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
+        p = convert_to_qt_format.scaled (self.ui.load_pages.stream.width (), self.ui.load_pages.stream.height (),
+                                         Qt.KeepAspectRatio)
+        return QPixmap.fromImage (p)
 
     # END OF THE VIDEO THREAD SECTION
     # ///////////////////////////////////////////////////////////////
@@ -131,58 +144,58 @@ class MainWindow(QMainWindow):
     # ///////////////////////////////////////////////////////////////
     def btn_clicked(self):
         # GET BT CLICKED
-        btn = SetupMainWindow.setup_btns(self)
+        btn = SetupMainWindow.setup_btns (self)
 
         # Remove Selection If Clicked By "btn_close_left_column"
-        if btn.objectName() != "btn_settings":
-            self.ui.left_menu.deselect_all_tab()
+        if btn.objectName () != "btn_settings":
+            self.ui.left_menu.deselect_all_tab ()
 
         # Get Title Bar Btn And Reset Active
-        top_settings = MainFunctions.get_title_bar_btn(self, "btn_top_settings")
-        top_settings.set_active(False)
+        top_settings = MainFunctions.get_title_bar_btn (self, "btn_top_settings")
+        top_settings.set_active (False)
 
         # LEFT MENU
         # ///////////////////////////////////////////////////////////////
 
         # HOME BTN
-        if btn.objectName() == "btn_home":
+        if btn.objectName () == "btn_home":
             # Select Menu
-            self.ui.left_menu.select_only_one(btn.objectName())
+            self.ui.left_menu.select_only_one (btn.objectName ())
 
             # Load Page 1
-            MainFunctions.set_page(self, self.ui.load_pages.page_1)
+            MainFunctions.set_page (self, self.ui.load_pages.page_1)
 
         # LOAD USER PAGE
-        if btn.objectName() == "btn_add_user":
+        if btn.objectName () == "btn_add_user":
             # Select Menu
-            self.ui.left_menu.select_only_one(btn.objectName())
+            self.ui.left_menu.select_only_one (btn.objectName ())
 
             # Load Page 3
-            MainFunctions.set_page(self, self.ui.load_pages.page_2)
+            MainFunctions.set_page (self, self.ui.load_pages.page_2)
 
         # TITLE BAR MENU
         # ///////////////////////////////////////////////////////////////
 
         # SETTINGS TITLE BAR
-        if btn.objectName() == "btn_top_settings":
+        if btn.objectName () == "btn_top_settings":
             # Toogle Active
-            if not MainFunctions.right_column_is_visible(self):
-                btn.set_active(True)
+            if not MainFunctions.right_column_is_visible (self):
+                btn.set_active (True)
 
                 # Show / Hide
-                MainFunctions.toggle_right_column(self)
+                MainFunctions.toggle_right_column (self)
             else:
-                btn.set_active(False)
+                btn.set_active (False)
 
                 # Show / Hide
-                MainFunctions.toggle_right_column(self)
+                MainFunctions.toggle_right_column (self)
 
             # Get Left Menu Btn
-            top_settings = MainFunctions.get_left_menu_btn(self, "btn_settings")
-            top_settings.set_active_tab(False)
+            top_settings = MainFunctions.get_left_menu_btn (self, "btn_settings")
+            top_settings.set_active_tab (False)
 
             # DEBUG
-        print(f"Button {btn.objectName()}, clicked!")
+        print (f"Button {btn.objectName ()}, clicked!")
 
     # LEFT MENU BTN IS RELEASED
     # Run function when btn is released
@@ -190,21 +203,21 @@ class MainWindow(QMainWindow):
     # ///////////////////////////////////////////////////////////////
     def btn_released(self):
         # GET BT CLICKED
-        btn = SetupMainWindow.setup_btns(self)
+        btn = SetupMainWindow.setup_btns (self)
 
         # DEBUG
-        print(f"Button {btn.objectName()}, released!")
+        print (f"Button {btn.objectName ()}, released!")
 
     # RESIZE EVENT
     # ///////////////////////////////////////////////////////////////
     def resizeEvent(self, event):
-        SetupMainWindow.resize_grips(self)
+        SetupMainWindow.resize_grips (self)
 
     # MOUSE CLICK EVENTS
     # ///////////////////////////////////////////////////////////////
     def mousePressEvent(self, event):
         # SET DRAG POS WINDOW
-        self.dragPos = event.globalPos()
+        self.dragPos = event.globalPos ()
 
 
 # SETTINGS WHEN TO START
@@ -213,13 +226,13 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     # APPLICATION
     # ///////////////////////////////////////////////////////////////
-    app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon("icon.ico"))
-    window = MainWindow()
+    app = QApplication (sys.argv)
+    app.setWindowIcon (QIcon ("icon.ico"))
+    window = MainWindow ()
 
     # EXEC APP
     # ///////////////////////////////////////////////////////////////
-    sys.exit(app.exec())
+    sys.exit (app.exec ())
 
     """        # BOTTOM INFORMATION
             if btn.objectName() == "btn_info":

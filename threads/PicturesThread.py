@@ -26,11 +26,14 @@ class PicturesThread (QThread):
             self.page_pixmap_signal.emit (cv_img)
         while self._run_flag:
             if not self.q.empty():
-                self.threadLock.acquire ()
-                img = self.q.get()
-                self.page_pixmap_signal.emit(img)
-                self.side_pixmap_signal.emit(img)
-                self.threadLock.release()
+                try:
+                    self.threadLock.acquire ()
+                    img = self.q.get()
+                    self.page_pixmap_signal.emit(img)
+                    self.side_pixmap_signal.emit(img)
+                    self.threadLock.release()
+                except:
+                    print("thread error")
             time.sleep(1)
 
     def stop(self):

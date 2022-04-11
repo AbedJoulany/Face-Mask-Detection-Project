@@ -10,8 +10,8 @@ from threads.PicturesThread import PicturesThread
 from picBox import *
 from queue import Queue
 import threading
-
 threadLock = threading.Lock()
+
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
 from qt_core import *
@@ -35,9 +35,9 @@ os.environ["QT_FONT_DPI"] = "96"
 
 # MAIN WINDOW
 # ///////////////////////////////////////////////////////////////
-class MainWindow (QMainWindow):
+class MainWindow(QMainWindow):
     def __init__(self):
-        super ().__init__ ()
+        super().__init__()
 
         # SETUP MAIN WINDOw
         # Load widgets from "gui\uis\main_window\ui_main.py"
@@ -105,6 +105,7 @@ class MainWindow (QMainWindow):
         box.setImage (qt_img)
         object.setPixmap (qt_img)
         self.ui.load_pages.gridLayout_2.addWidget (box, *self.getPos ())
+        print('in add pic')
 
     @Slot (np.ndarray)
     def add_image_to_side(self, cv_img):

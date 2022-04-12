@@ -21,7 +21,10 @@ class VideoThread (QThread):
             ret1, cv_img = cap.read()
             if ret1:
                 frameId = cap.get(1)
-                frame = getFrame(cv_img, frameId,self.q, self.threadLock)
+                try:
+                    frame = getFrame(cv_img, frameId,self.q, self.threadLock)
+                except:
+                    print("exception raised")
                 self.change_pixmap_signal.emit(frame)
         # shut down capture system
         cap.release()

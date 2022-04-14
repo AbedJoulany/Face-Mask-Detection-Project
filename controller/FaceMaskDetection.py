@@ -115,15 +115,16 @@ def getFrame(frame, frameId, q, threadLock):
 
 def run_rec(frame, q, thread_lock):
     face_names = sfr.detect_known_faces(frame)
-    for name in zip(face_names):
+    for name in face_names:
         # y1, x2, y2, x1 = face_loc[0], face_loc[1], face_loc[2], face_loc[3]
         # cv2.putText(frame, name, (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
         # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 200), 4)
         # faces_file_name = FacesImagesFolder + "/image_" + str(name) + ".jpg"
         # cv2.imwrite(faces_file_name, frame)
         try:
-            thread_lock.acquire()
-            q.put(frame)
-            thread_lock.release()
+
+            threadLock.acquire()
+            q.put((frame,str(name)))
+            threadLock.release()
         except:
             print("thread error")

@@ -123,8 +123,8 @@ def run_rec(frame, q, thread_lock):
         # cv2.imwrite(faces_file_name, frame)
         try:
 
-            threadLock.acquire()
+            thread_lock.acquire()
             q.put((frame,str(name)))
-            threadLock.release()
+            thread_lock.release()
         except:
             print("thread error")

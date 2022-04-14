@@ -19,10 +19,10 @@ weightsPath = r"face_detector\res10_300x300_ssd_iter_140000.caffemodel"
 maskNet = load_model("./controller/mask_detector.model")
 FacesImagesFolder = r"savedImages/Faces"
 FullImagesFolder = r"savedImages/FullImages"
-pool = ThreadPoolExecutor(max_workers=2)
+pool = ThreadPoolExecutor(max_workers=1)
 
 sfr = SimpleFacerec()
-sfr.load_encoding_images("controller/images/")
+sfr.load_encoding_images("controller/images")
 
 counter = 0
 
@@ -101,8 +101,8 @@ def getFrame(frame, frameId, q, threadLock):
             # making a thread for face recognition
             pool.submit(run_rec, frame[startY:endY, startX:endX], q, threadLock)
             # thread_func(frame[startY:endY, startX:endX], q, threadLock)
-            fullimagesfilename = FullImagesFolder + "/image_" + str(int(frameId)) + ".jpg"
-            cv2.imwrite(fullimagesfilename, frame)
+            # fullimagesfilename = FullImagesFolder + "/image_" + str(int(frameId)) + ".jpg"
+            # cv2.imwrite(fullimagesfilename, frame)
 
         label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
 
@@ -113,22 +113,18 @@ def getFrame(frame, frameId, q, threadLock):
     return frame
 
 
-def run_rec(frame, q, threadLock):
+def run_rec(frame, q, thread_lock):
     face_names = sfr.detect_known_faces(frame)
     for name in face_names:
         # y1, x2, y2, x1 = face_loc[0], face_loc[1], face_loc[2], face_loc[3]
         # cv2.putText(frame, name, (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
         # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 200), 4)
-        faces_file_name = FacesImagesFolder + "/image_" + str(name) + ".jpg"
-        cv2.imwrite(faces_file_name, frame)
+        # faces_file_name = FacesImagesFolder + "/image_" + str(name) + ".jpg"
+        # cv2.imwrite(faces_file_name, frame)
         try:
+
             threadLock.acquire()
             q.put((frame,str(name)))
             threadLock.release()
         except:
             print("thread error")
-
-
-def thread_func(frame, q, thread_lock):
-    download_thread = threading.Thread(target=run_rec, name="Downloader", args=(frame, q, thread_lock))
-    download_thread.start()

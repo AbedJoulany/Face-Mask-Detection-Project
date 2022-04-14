@@ -14,6 +14,7 @@ class VideoThread (QThread):
 
     def run(self):
         # capture from web cam
+
         try :
             cap = cv2.VideoCapture(0)
             cap.set (cv2.CAP_PROP_FRAME_WIDTH, 1290)

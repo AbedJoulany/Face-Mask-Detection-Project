@@ -94,28 +94,29 @@ class MainWindow(QMainWindow):
         qt_img = self.convert_cv_qt (cv_img)
         self.ui.load_pages.stream.setPixmap (qt_img)
 
-    @Slot (np.ndarray)
-    def add_image_to_page(self, cv_img):
+    @Slot (np.ndarray,str)
+    def add_image_to_page(self, cv_img,name):
         """Updates the image_label with a new opencv image"""
         qt_img = self.convert_cv_qt (cv_img)
         object = QLabel ()
-        box = picBox ()
+        box = picBox()
         # scaling the image
         qt_img = qt_img.scaled (300, 300, Qt.KeepAspectRatio)
         box.setImage (qt_img)
+        box.set_data (name)
         object.setPixmap (qt_img)
         self.ui.load_pages.gridLayout_2.addWidget (box, *self.getPos ())
-        print('in add pic')
 
-    @Slot (np.ndarray)
-    def add_image_to_side(self, cv_img):
+    @Slot (np.ndarray,str)
+    def add_image_to_side(self, cv_img,name):
         """Updates the image_label with a new opencv image"""
         qt_img = self.convert_cv_qt (cv_img)
         object = QLabel ()
-        box = picBox ()
+        box = picBox()
         # scaling the image
         qt_img = qt_img.scaled (300, 300, Qt.KeepAspectRatio)
         box.setImage (qt_img)
+        box.set_data (name)
         object.setPixmap (qt_img)
         self.ui.load_pages.right_pic_layout.addWidget (object)
 

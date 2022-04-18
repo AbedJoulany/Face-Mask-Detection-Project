@@ -122,9 +122,8 @@ def run_rec(frame, q, thread_lock):
         # faces_file_name = FacesImagesFolder + "/image_" + str(name) + ".jpg"
         # cv2.imwrite(faces_file_name, frame)
         try:
-
-            threadLock.acquire()
-            q.put((frame,str(name)))
-            threadLock.release()
+            thread_lock.acquire()
+            q.put((frame,name))
+            thread_lock.release()
         except:
             print("thread error")

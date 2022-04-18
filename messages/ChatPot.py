@@ -4,7 +4,6 @@ from email.message import EmailMessage
 import requests
 
 
-
 def email_alert(subject, body, to):
     msg = EmailMessage()
     msg.set_content(body)
@@ -23,5 +22,5 @@ def email_alert(subject, body, to):
     server.quit()
 
 
-if __name__ == '__main__':
-    email_alert("No mask detection", "hey, please put your mask!!!!", "abedallahjo@edu.hac.ac.il")
+def send_email(name, email):
+    email_alert("No mask detection", "hey {}, please put your mask!!!!".format(name), email)

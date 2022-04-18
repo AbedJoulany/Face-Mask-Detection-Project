@@ -21,12 +21,11 @@ print ("Opened database successfully")
   email TEXT NOT NULL UNIQUE,
   phone_number TEXT NOT NULL UNIQUE);''')"""
 
-conn.execute ('INSERT INTO person (id_number, first_name, last_name, email, phone_number)'
-              ' VALUES("206461394","abedallah","joulany","abedallah99@gmail.com","0528038984");')
-conn.commit()
+"""conn.execute ('INSERT INTO person (id_number, first_name, last_name, email, phone_number)'
+              ' VALUES("208223826","mohamad","ektelat","mohamadek@edu.hac.ac.il","0528484614");')
+conn.commit()"""
 
-"""cursor = conn.execute('SELECT *'
-                      ' FROM person where first_name = "{}" and last_name = "{}";'.format("abedallah","joulany"))"""
+cursor = conn.execute('SELECT * FROM person')
 for row in cursor:
     print(row)
 conn.close ()

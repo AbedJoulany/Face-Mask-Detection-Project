@@ -53,5 +53,6 @@ class SimpleFacerec:
                 if matches[best_match_index]:
                     name = self.known_face_names[best_match_index]
             face_names.append(name)
+            print(name)
 
         return face_names

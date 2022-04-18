@@ -55,10 +55,10 @@ class SetupMainWindow:
         },
 
         {
-            "btn_icon" : "icon_add_user.svg",
-            "btn_id" : "btn_add_user",
-            "btn_text" : "Add Users",
-            "btn_tooltip" : "Add users",
+            "btn_icon" : "no_icon.svg",
+            "btn_id" : "btn_pictures",
+            "btn_text" : "show pictures",
+            "btn_tooltip" : "show pictures",
             "show_top" : True,
             "is_active" : False
         },

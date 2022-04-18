@@ -168,8 +168,8 @@ class MainWindow(QMainWindow):
             # Load Page 1
             MainFunctions.set_page(self, self.ui.load_pages.page_1)
 
-        # LOAD USER PAGE
-        if btn.objectName() == "btn_add_user":
+
+        if btn.objectName () == "btn_pictures":
             # Select Menu
             self.ui.left_menu.select_only_one(btn.objectName())
 

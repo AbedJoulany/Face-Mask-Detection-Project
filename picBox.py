@@ -1,5 +1,6 @@
 from qt_core import *
 from database.personDaoImpl import *
+from messages.ChatPot import send_email
 
 class picBox (QWidget):
 
@@ -33,5 +34,6 @@ class picBox (QWidget):
         person = dao.get_person_by_name(n[0],n[1])
         self.name.setText(name)
         self.email.setText(person.email)
+        send_email(name, person.email)
         self.phone_number.setText(person.phone_number)
 

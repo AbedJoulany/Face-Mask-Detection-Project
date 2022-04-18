@@ -4,7 +4,7 @@ import cv2
 from qt_core import *
 import numpy as np
 import os
-import MySQLdb as mdb
+
 from PySide6.QtSql import QSqlDatabase
 
 imagesFolder = r"savedImages"

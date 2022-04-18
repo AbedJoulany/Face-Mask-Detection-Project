@@ -1,5 +1,6 @@
 from mysql.connector import Error
-from mysql.connector import pooling
+import sqlite3
+import os.path
 
 
 class Connection_pool():
@@ -12,24 +13,16 @@ class Connection_pool():
             return cls.instance
 
     def __init__(self):
-        try:
-            self.pool = pooling.MySQLConnectionPool (pool_name="py_pool",
-                                                     pool_size=2,
-                                                     pool_reset_session=True,
-                                                     host='localhost',
-                                                     database='face_mask_db',
-                                                     user='root',
-                                                     password='root')
-        except Error as e:
-            print ("Error while connecting to MySQL using Connection pool ", e)
+        pass
 
     def get_connection(self):
-        return self.pool.get_connection()
+        BASE_DIR = os.path.dirname (os.path.abspath ("face_mask.db"))
+        db_path = os.path.join (BASE_DIR, "face_mask.db")
+        return sqlite3.connect(db_path)
 
     def close_connection(self, con):
         try:
-            if con.is_connected():
-                con.close()
-                print ("MySQL connection is closed")
+            con.close()
+            print ("sqlite connection is closed")
         except Error as e:
-            print ("Error while connecting to MySQL using Connection pool ", e)
+            print ("Error while connecting to sqlite using Connection pool ", e)

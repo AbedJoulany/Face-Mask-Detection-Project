@@ -124,6 +124,7 @@ def run_rec(frame, q, thread_lock):
         try:
             thread_lock.acquire()
             q.put((frame,name))
+
             thread_lock.release()
         except:
             print("thread error")

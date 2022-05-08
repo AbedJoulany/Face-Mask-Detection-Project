@@ -10,6 +10,9 @@ from threads.PicturesThread import PicturesThread
 from picBox import *
 from queue import Queue
 import threading
+from datetime import datetime
+
+persons_dict = {}
 
 threadLock = threading.Lock()
 
@@ -36,6 +39,21 @@ os.environ["QT_FONT_DPI"] = "96"
 
 # MAIN WINDOW
 # ///////////////////////////////////////////////////////////////
+def check_data(name):
+    if name == "Unknown":
+        return 1
+    now = datetime.now()
+    if name not in persons_dict:
+        persons_dict[name] = now.strftime("%Y%m%d%H%M%S")
+        return 2
+    if name in persons_dict:
+        print((datetime.strptime(persons_dict[name], "%Y%m%d%H%M%S") - now).total_seconds())
+        if (now - datetime.strptime(persons_dict[name], "%Y%m%d%H%M%S")).total_seconds() > 60:
+            persons_dict[name] = now.strftime("%Y%m%d%H%M%S")
+            return 3
+    return 4
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -65,7 +83,7 @@ class MainWindow(QMainWindow):
         # connect its signal to the update_image slot
         self.thread.change_pixmap_signal.connect(self.update_image)
         self.thread1.page_pixmap_signal.connect(self.add_image_to_page)
-        self.thread1.side_pixmap_signal.connect(self.add_image_to_side)
+        # self.thread1.side_pixmap_signal.connect(self.add_image_to_side)
         ###########################################################
 
         # ///////////////////////////////////////////////////////////////
@@ -98,28 +116,35 @@ class MainWindow(QMainWindow):
     @Slot(np.ndarray, str)
     def add_image_to_page(self, cv_img, name):
         """Updates the image_label with a new opencv image"""
-        qt_img = self.convert_cv_qt(cv_img)
-        object = QLabel()
-        box = picBox()
-        # scaling the image
-        qt_img = qt_img.scaled(300, 300, Qt.KeepAspectRatio)
-        box.setImage(qt_img)
-        box.set_data(name)
-        object.setPixmap(qt_img)
-        self.ui.load_pages.gridLayout_2.addWidget(box, *self.getPos())
+        check = check_data(name)
+        #print("in the check:", check)
+        if check == 2 or check == 3:
+            qt_img = self.convert_cv_qt(cv_img)
+            object = QLabel()
+            box = picBox()
+            # scaling the image
+            qt_img = qt_img.scaled(300, 300, Qt.KeepAspectRatio)
+            box.setImage(qt_img)
+            box.set_data(name)
+            object.setPixmap(qt_img)
+            self.ui.load_pages.gridLayout_2.addWidget(box, *self.getPos())
+            self.ui.load_pages.right_pic_layout.addWidget(object)
 
-    @Slot(np.ndarray, str)
-    def add_image_to_side(self, cv_img, name):
-        """Updates the image_label with a new opencv image"""
-        qt_img = self.convert_cv_qt(cv_img)
-        object = QLabel()
-        box = picBox()
-        # scaling the image
-        qt_img = qt_img.scaled(300, 300, Qt.KeepAspectRatio)
-        box.setImage(qt_img)
-        box.set_data(name)
-        object.setPixmap(qt_img)
-        self.ui.load_pages.right_pic_layout.addWidget(object)
+
+    # @Slot(np.ndarray, str)
+    # def add_image_to_side(self, cv_img, name):
+    #     """Updates the image_label with a new opencv image"""
+    #     qt_img = self.convert_cv_qt(cv_img)
+    #     object = QLabel()
+    #     box = picBox()
+    #     # scaling the image
+    #     qt_img = qt_img.scaled(300, 300, Qt.KeepAspectRatio)
+    #     box.setImage(qt_img)
+    #     box.set_data(name)
+    #     object.setPixmap(qt_img)
+    #     self.ui.load_pages.right_pic_layout.addWidget(object)
+
+
 
     def getPos(self):
         self.j += 1

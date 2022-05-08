@@ -46,13 +46,13 @@ class SimpleFacerec:
 
             # Or instead, use the known face with the smallest distance to the new face
             face_distances = face_recognition.face_distance(self.known_face_encodings, face_encoding)
-            print(face_distances)
+            #print(face_distances)
             if face_distances.size > 0:
                 best_match_index = np.argmin(face_distances)
-                print(best_match_index)
+                #print(best_match_index)
                 if matches[best_match_index]:
                     name = self.known_face_names[best_match_index]
             face_names.append(name)
-            print(name)
+            #print(name)
 
         return face_names

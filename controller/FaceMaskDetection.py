@@ -24,20 +24,17 @@ pool = ThreadPoolExecutor(max_workers=1)
 sfr = SimpleFacerec()
 sfr.load_encoding_images("controller/images")
 
-counter = 0
-
-
 # known = RecognitionThread()
 
 
 def known_faces(frame):
     face_locations, face_names = sfr.detect_known_faces(frame)
-    for face_loc, name in zip(face_locations, face_names):
-        # y1, x2, y2, x1 = face_loc[0], face_loc[1], face_loc[2], face_loc[3]
-        # cv2.putText(frame, name, (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
-        # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 200), 4)
-        facesfilename = FacesImagesFolder + "/image_" + name + ".jpg"
-        cv2.imwrite(facesfilename, frame)
+    # for face_loc, name in zip(face_locations, face_names):
+    # y1, x2, y2, x1 = face_loc[0], face_loc[1], face_loc[2], face_loc[3]
+    # cv2.putText(frame, name, (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+    # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 200), 4)
+    # facesfilename = FacesImagesFolder + "/image_" + name + ".jpg"
+    # cv2.imwrite(facesfilename, frame)
 
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
@@ -77,10 +74,9 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
     return (locs, preds)
 
 
-def getFrame(frame, frameId, q, threadLock):
+def getFrame(frame, counter, q, threadLock):
     faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
-    global counter
-    counter += 1
+
     frame = imutils.resize(frame, width=400)
     frame = cv2.flip(frame, 1)
     (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
@@ -97,7 +93,7 @@ def getFrame(frame, frameId, q, threadLock):
 
         # if (label == "No Mask") & (frameId % math.floor(30) == 0):
         # f = frame[startY:endY, startX:endX]
-        if label == "No Mask" and counter % 15 == 0:
+        if label == "No Mask" and counter % 2:
             # making a thread for face recognition
             pool.submit(run_rec, frame[startY:endY, startX:endX], q, threadLock)
             # thread_func(frame[startY:endY, startX:endX], q, threadLock)
@@ -109,7 +105,6 @@ def getFrame(frame, frameId, q, threadLock):
         cv2.putText(frame, label, (startX, startY - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
         cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
-
     return frame
 
 
@@ -123,7 +118,7 @@ def run_rec(frame, q, thread_lock):
         # cv2.imwrite(faces_file_name, frame)
         try:
             thread_lock.acquire()
-            q.put((frame,name))
+            q.put((frame, name))
 
             thread_lock.release()
         except:

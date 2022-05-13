@@ -9,7 +9,7 @@ class Connection_pool():
     class Connection_pool(object):
         def __new__(cls):
             if not hasattr (cls, 'instance'):
-                cls.instance = super (Connection_pool, cls).__new__ (cls)
+                cls.instance = super(Connection_pool, cls).__new__ (cls)
             return cls.instance
 
     def __init__(self):

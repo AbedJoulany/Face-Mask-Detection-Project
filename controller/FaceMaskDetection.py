@@ -24,18 +24,6 @@ pool = ThreadPoolExecutor(max_workers=1)
 sfr = SimpleFacerec()
 sfr.load_encoding_images("controller/images")
 
-# known = RecognitionThread()
-
-
-def known_faces(frame):
-    face_locations, face_names = sfr.detect_known_faces(frame)
-    # for face_loc, name in zip(face_locations, face_names):
-    # y1, x2, y2, x1 = face_loc[0], face_loc[1], face_loc[2], face_loc[3]
-    # cv2.putText(frame, name, (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
-    # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 200), 4)
-    # facesfilename = FacesImagesFolder + "/image_" + name + ".jpg"
-    # cv2.imwrite(facesfilename, frame)
-
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
     (h, w) = frame.shape[:2]
@@ -77,7 +65,7 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 def getFrame(frame, counter, q, threadLock):
     faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 
-    frame = imutils.resize(frame, width=400)
+    #frame = imutils.resize(frame, width=400)
     frame = cv2.flip(frame, 1)
     (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
 
@@ -85,20 +73,12 @@ def getFrame(frame, counter, q, threadLock):
         (startX, startY, endX, endY) = box
         (mask, withoutMask) = pred
 
-        # x = threading.Thread(target=known_faces(frame[startY:endY, startX:endX]))
-        # x.daemon = True
-
         label = "No Mask" if mask > withoutMask else "Mask"
         color = (0, 0, 255) if label == "No Mask" else (0, 255, 0)
 
-        # if (label == "No Mask") & (frameId % math.floor(30) == 0):
-        # f = frame[startY:endY, startX:endX]
-        if label == "No Mask" and counter % 2:
+        if label == "No Mask" and counter % 2 == 0:
             # making a thread for face recognition
-            pool.submit(run_rec, frame[startY:endY, startX:endX], q, threadLock)
-            # thread_func(frame[startY:endY, startX:endX], q, threadLock)
-            # fullimagesfilename = FullImagesFolder + "/image_" + str(int(frameId)) + ".jpg"
-            # cv2.imwrite(fullimagesfilename, frame)
+            pool.submit(run_rec, frame, q, threadLock, startX, startY, endX, endY)
 
         label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
 
@@ -108,18 +88,12 @@ def getFrame(frame, counter, q, threadLock):
     return frame
 
 
-def run_rec(frame, q, thread_lock):
-    face_names = sfr.detect_known_faces(frame)
-    for name in face_names:
-        # y1, x2, y2, x1 = face_loc[0], face_loc[1], face_loc[2], face_loc[3]
-        # cv2.putText(frame, name, (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
-        # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 200), 4)
-        # faces_file_name = FacesImagesFolder + "/image_" + str(name) + ".jpg"
-        # cv2.imwrite(faces_file_name, frame)
-        try:
-            thread_lock.acquire()
-            q.put((frame, name))
-
-            thread_lock.release()
-        except:
-            print("thread error")
+def run_rec(frame, q, thread_lock, startX, startY, endX, endY):
+    tuple1 = (startY, endX, endY, startX)
+    face_name = sfr.detect_known_faces(cv2.resize(frame, (0, 0), fx=0.25, fy=0.25), tuple1)
+    try:
+        thread_lock.acquire()
+        q.put((frame[startY:endY, startX:endX], face_name))
+        thread_lock.release()
+    except:
+        print("thread error")

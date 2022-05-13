@@ -6,6 +6,7 @@ import time
 from datetime import datetime
 
 persons_dict = {}
+dao = PersonDaoImpl()
 
 
 class picBox(QWidget):
@@ -28,12 +29,9 @@ class picBox(QWidget):
         self.image.setPixmap(img)
 
     def set_data(self, name):
-        dao = PersonDaoImpl()
         n = name.split(' ')
         person = dao.get_person_by_name(n[0], n[1])
         self.name.setText(name)
         self.email.setText(person.email)
         send_email(name, person.email)
         self.phone_number.setText(person.phone_number)
-
-

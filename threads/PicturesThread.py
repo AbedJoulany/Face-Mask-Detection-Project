@@ -11,10 +11,10 @@ imagesFolder = r"savedImages"
 
 
 class PicturesThread (QThread):
-    page_pixmap_signal = Signal (np.ndarray,str)
-    side_pixmap_signal = Signal (np.ndarray,str)
+    page_pixmap_signal = Signal (np.ndarray, str)
+    side_pixmap_signal = Signal (np.ndarray, str)
 
-    def __init__(self,q,threadLock):
+    def __init__(self, q, threadLock):
         super ().__init__ ()
         self.q = q
         self._run_flag = True
@@ -30,9 +30,7 @@ class PicturesThread (QThread):
                 try:
                     self.threadLock.acquire()
                     img_name = self.q.get()
-                    # print(img_name[1])
                     self.page_pixmap_signal.emit(img_name[0],img_name[1])
-                    # self.side_pixmap_signal.emit(img_name[0],img_name[1])
                     self.threadLock.release()
                 except:
                     print("thread error")

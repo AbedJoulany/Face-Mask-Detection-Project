@@ -23,7 +23,6 @@ class VideoThread(QThread):
             while self._run_flag:
                 ret1, cv_img = cap.read()
                 if ret1:
-                    frameId = cap.get(1)
                     try:
                         frame = getFrame(cv_img, counter, self.q, self.threadLock)
                         self.change_pixmap_signal.emit(frame)

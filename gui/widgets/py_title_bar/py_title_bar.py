@@ -1,18 +1,3 @@
-# ///////////////////////////////////////////////////////////////
-#
-# BY: WANDERSON M.PIMENTA
-# PROJECT MADE WITH: Qt Designer and PySide6
-# V: 1.0.0
-#
-# This project can be used freely for all uses, as long as they maintain the
-# respective credits only in the Python scripts, any information in the visual
-# interface (GUI) can be modified without any implication.
-#
-# There are limitations on Qt licenses if you want to use your products
-# commercially, I recommend reading them on the official website:
-# https://doc.qt.io/qtforpython/licenses.html
-#
-# ///////////////////////////////////////////////////////////////
 
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
@@ -52,8 +37,8 @@ class PyTitleBar(QWidget):
         self,
         parent,
         app_parent,
-        logo_image = "logo_top_100x22.svg",
-        logo_width = 100,
+        #logo_image = "logo_top_100x22.svg",
+        #logo_width = 100,
         buttons = None,
         dark_one = "#1b1e23",
         bg_color = "#343b48",
@@ -78,7 +63,7 @@ class PyTitleBar(QWidget):
         self.settings = settings.items
 
         # PARAMETERS
-        self._logo_image = logo_image
+        #self._logo_image = logo_image
         self._dark_one = dark_one
         self._bg_color = bg_color
         self._div_color = div_color
@@ -104,8 +89,8 @@ class PyTitleBar(QWidget):
         self.bg.setStyleSheet(f"background-color: {bg_color}; border-radius: {radius}px;")
 
         # SET LOGO AND WIDTH
-        self.top_logo.setMinimumWidth(logo_width)
-        self.top_logo.setMaximumWidth(logo_width)
+        #self.top_logo.setMinimumWidth(logo_width)
+        #self.top_logo.setMaximumWidth(logo_width)
         #self.top_logo.setPixmap(Functions.set_svg_image(logo_image))
 
         # MOVE WINDOW / MAXIMIZE / RESTORE
@@ -126,7 +111,7 @@ class PyTitleBar(QWidget):
 
         # MOVE APP WIDGETS
         if is_custom_title_bar:
-            self.top_logo.mouseMoveEvent = moveWindow
+            #self.top_logo.mouseMoveEvent = moveWindow
             self.div_1.mouseMoveEvent = moveWindow
             self.title_label.mouseMoveEvent = moveWindow
             self.div_2.mouseMoveEvent = moveWindow
@@ -134,14 +119,14 @@ class PyTitleBar(QWidget):
 
         # MAXIMIZE / RESTORE
         if is_custom_title_bar:
-            self.top_logo.mouseDoubleClickEvent = self.maximize_restore
+            #self.top_logo.mouseDoubleClickEvent = self.maximize_restore
             self.div_1.mouseDoubleClickEvent = self.maximize_restore
             self.title_label.mouseDoubleClickEvent = self.maximize_restore
             self.div_2.mouseDoubleClickEvent = self.maximize_restore
 
         # ADD WIDGETS TO TITLE BAR
         # ///////////////////////////////////////////////////////////////
-        self.bg_layout.addWidget(self.top_logo)
+        #self.bg_layout.addWidget(self.top_logo)
         self.bg_layout.addWidget(self.div_1)
         self.bg_layout.addWidget(self.title_label)
         self.bg_layout.addWidget(self.div_2)
@@ -267,6 +252,7 @@ class PyTitleBar(QWidget):
         self.div_2 = PyDiv(self._div_color)
         self.div_3 = PyDiv(self._div_color)
 
+        """
         # LEFT FRAME WITH MOVE APP
         self.top_logo = QLabel()
         self.top_logo_layout = QVBoxLayout(self.top_logo)
@@ -274,6 +260,7 @@ class PyTitleBar(QWidget):
         self.logo_svg = QSvgWidget()
         self.logo_svg.load(Functions.set_svg_image(self._logo_image))
         self.top_logo_layout.addWidget(self.logo_svg, Qt.AlignCenter, Qt.AlignCenter)
+        """
 
         # TITLE LABEL
         self.title_label = QLabel()

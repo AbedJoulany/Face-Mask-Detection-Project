@@ -23,12 +23,11 @@ class picBox(QWidget):
         self.verticalLayout.addWidget(self.name)
         self.verticalLayout.addWidget(self.email)
         self.verticalLayout.addWidget(self.phone_number)
-        # self.frame.setLayout(self.verticalLayout)
 
     def setImage(self, img):
         self.image.setPixmap(img)
 
-    def set_data(self, name):
+    def set_data(self, name, dao: PersonDaoImpl):
         n = name.split(' ')
         person = dao.get_person_by_name(n[0], n[1])
         self.name.setText(name)

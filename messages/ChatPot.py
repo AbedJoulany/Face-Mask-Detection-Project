@@ -1,7 +1,11 @@
 import smtplib
 from email.message import EmailMessage
 
-import requests
+user = "maskdetection.program@gmail.com"
+password = "iqtfhpyqurelbcmw"
+server = smtplib.SMTP("smtp.gmail.com", 587)
+server.starttls()
+server.login(user, password)
 
 
 def email_alert(subject, body, to):
@@ -12,13 +16,11 @@ def email_alert(subject, body, to):
 
     user = "maskdetection.program@gmail.com"
     msg['from'] = user
-    password = "iqtfhpyqurelbcmw"
 
-    server = smtplib.SMTP("smtp.gmail.com", 587)
-    server.starttls()
-    server.login(user, password)
     server.send_message(msg)
 
+
+def quite():
     server.quit()
 
 

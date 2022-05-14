@@ -175,8 +175,7 @@ class MainWindow(QMainWindow):
             # Load Page 1
             MainFunctions.set_page(self, self.ui.load_pages.page_1)
 
-
-        if btn.objectName () == "btn_pictures":
+        if btn.objectName() == "btn_pictures":
             # Select Menu
             self.ui.left_menu.select_only_one(btn.objectName())
 
@@ -266,3 +265,4 @@ if __name__ == "__main__":
     # EXEC APP
     # ///////////////////////////////////////////////////////////////
     sys.exit(app.exec())
+

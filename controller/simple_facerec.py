@@ -3,6 +3,8 @@ import cv2
 import os
 import glob
 import numpy as np
+from functools import cache
+import time
 
 
 class SimpleFacerec:
@@ -31,28 +33,23 @@ class SimpleFacerec:
 
         print("Encoding images loaded")
 
-    def detect_known_faces(self, frame):
-
+    def detect_known_faces(self, frame, location_tuple):
         # # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
         rgb_small_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        face_encodings = face_recognition.face_encodings(rgb_small_frame)
+        start = time.time()
+        face_locations = face_recognition.face_locations(rgb_small_frame, model='hog')
+        face_encodings = \
+            face_recognition.face_encodings(rgb_small_frame, model="small", known_face_locations=face_locations)
+        end = time.time()
 
-        face_names = []
-        for face_encoding in face_encodings:
-            # See if the face is a match for the known face(s)
-            matches = face_recognition.compare_faces(self.known_face_encodings, face_encoding)
-            name = "Unknown"
+        face_distances = face_recognition.face_distance(self.known_face_encodings, face_encodings[0])
+        print(end - start)
+        name = "Unknown"
 
-            # Or instead, use the known face with the smallest distance to the new face
-            face_distances = face_recognition.face_distance(self.known_face_encodings, face_encoding)
-            #print(face_distances)
-            if face_distances.size > 0:
-                best_match_index = np.argmin(face_distances)
-                #print(best_match_index)
-                if matches[best_match_index]:
-                    name = self.known_face_names[best_match_index]
-            face_names.append(name)
-            #print(name)
-
-        return face_names
+        if face_distances.size > 0:
+            best_match_index = np.argmin(face_distances)
+            matches = face_recognition.compare_faces(self.known_face_encodings, face_encodings[0])
+            if matches[best_match_index]:
+                name = self.known_face_names[best_match_index]
+        return name

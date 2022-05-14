@@ -83,9 +83,8 @@ class MainWindow(QMainWindow):
         # connect its signal to the update_image slot
         self.thread.change_pixmap_signal.connect(self.update_image)
         self.thread1.page_pixmap_signal.connect(self.add_image_to_page)
-        # self.thread1.side_pixmap_signal.connect(self.add_image_to_side)
         ###########################################################
-
+        self.dao = PersonDaoImpl()
         # ///////////////////////////////////////////////////////////////
         self.i = 0
         self.j = -1
@@ -117,7 +116,6 @@ class MainWindow(QMainWindow):
     def add_image_to_page(self, cv_img, name):
         """Updates the image_label with a new opencv image"""
         check = check_data(name)
-        #print("in the check:", check)
         if check == 2 or check == 3:
             qt_img = self.convert_cv_qt(cv_img)
             object = QLabel()
@@ -125,26 +123,10 @@ class MainWindow(QMainWindow):
             # scaling the image
             qt_img = qt_img.scaled(300, 300, Qt.KeepAspectRatio)
             box.setImage(qt_img)
-            box.set_data(name)
+            box.set_data(name, self.dao)
             object.setPixmap(qt_img)
             self.ui.load_pages.gridLayout_2.addWidget(box, *self.getPos())
             self.ui.load_pages.right_pic_layout.addWidget(object)
-
-
-    # @Slot(np.ndarray, str)
-    # def add_image_to_side(self, cv_img, name):
-    #     """Updates the image_label with a new opencv image"""
-    #     qt_img = self.convert_cv_qt(cv_img)
-    #     object = QLabel()
-    #     box = picBox()
-    #     # scaling the image
-    #     qt_img = qt_img.scaled(300, 300, Qt.KeepAspectRatio)
-    #     box.setImage(qt_img)
-    #     box.set_data(name)
-    #     object.setPixmap(qt_img)
-    #     self.ui.load_pages.right_pic_layout.addWidget(object)
-
-
 
     def getPos(self):
         self.j += 1
@@ -200,6 +182,29 @@ class MainWindow(QMainWindow):
 
             # Load Page 3
             MainFunctions.set_page(self, self.ui.load_pages.page_2)
+
+        # SETTINGS LEFT
+        if btn.objectName () == "btn_settings" or btn.objectName () == "btn_close_left_column":
+            # CHECK IF LEFT COLUMN IS VISIBLE
+            if not MainFunctions.left_column_is_visible (self):
+                # Show / Hide
+                MainFunctions.toggle_left_column (self)
+                self.ui.left_menu.select_only_one_tab (btn.objectName ())
+            else:
+                if btn.objectName () == "btn_close_left_column":
+                    self.ui.left_menu.deselect_all_tab ()
+                    # Show / Hide
+                    MainFunctions.toggle_left_column (self)
+                self.ui.left_menu.select_only_one_tab (btn.objectName ())
+
+            # Change Left Column Menu
+            if btn.objectName () != "btn_close_left_column":
+                MainFunctions.set_left_column_menu (
+                    self,
+                    menu=self.ui.left_column.menus.menu_1,
+                    title="Settings Left Column",
+                    icon_path=Functions.set_svg_icon ("icon_settings.svg")
+                )
 
         # TITLE BAR MENU
         # ///////////////////////////////////////////////////////////////
@@ -261,52 +266,3 @@ if __name__ == "__main__":
     # EXEC APP
     # ///////////////////////////////////////////////////////////////
     sys.exit(app.exec())
-
-    """        # BOTTOM INFORMATION
-            if btn.objectName() == "btn_info":
-                # CHECK IF LEFT COLUMN IS VISIBLE
-                if not MainFunctions.left_column_is_visible(self):
-                    self.ui.left_menu.select_only_one_tab(btn.objectName())
-
-                    # Show / Hide
-                    MainFunctions.toggle_left_column(self)
-                    self.ui.left_menu.select_only_one_tab(btn.objectName())
-                else:
-                    if btn.objectName() == "btn_close_left_column":
-                        self.ui.left_menu.deselect_all_tab()
-                        # Show / Hide
-                        MainFunctions.toggle_left_column(self)
-
-                    self.ui.left_menu.select_only_one_tab(btn.objectName())
-
-                # Change Left Column Menu
-                if btn.objectName() != "btn_close_left_column":
-                    MainFunctions.set_left_column_menu(
-                        self, 
-                        menu = self.ui.left_column.menus.menu_2,
-                        title = "Info tab",
-                        icon_path = Functions.set_svg_icon("icon_info.svg")
-                    )
-
-            # SETTINGS LEFT
-            if btn.objectName() == "btn_settings" or btn.objectName() == "btn_close_left_column":
-                # CHECK IF LEFT COLUMN IS VISIBLE
-                if not MainFunctions.left_column_is_visible(self):
-                    # Show / Hide
-                    MainFunctions.toggle_left_column(self)
-                    self.ui.left_menu.select_only_one_tab(btn.objectName())
-                else:
-                    if btn.objectName() == "btn_close_left_column":
-                        self.ui.left_menu.deselect_all_tab()
-                        # Show / Hide
-                        MainFunctions.toggle_left_column(self)
-                    self.ui.left_menu.select_only_one_tab(btn.objectName())
-
-                # Change Left Column Menu
-                if btn.objectName() != "btn_close_left_column":
-                    MainFunctions.set_left_column_menu(
-                        self, 
-                        menu = self.ui.left_column.menus.menu_1,
-                        title = "Settings Left Column",
-                        icon_path = Functions.set_svg_icon("icon_settings.svg")
-                    )"""

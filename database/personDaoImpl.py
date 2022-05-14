@@ -19,27 +19,27 @@ class PersonDaoImpl(object):
 
     def __init__(self):
         self.pool = Connection_pool()
-        connection = self.pool.get_connection()
-        connection.execute(create_table)
-        self.pool.close_connection(connection)
+        self.connection = self.pool.get_connection()
+        self.connection.execute(create_table)
+        #self.pool.close_connection(connection)
 
     def get_person_by_name(self, first, last):
-        connection = self.pool.get_connection()
-        cursor = connection.execute (get_person_query_by_name.format(str.lower(first), str.lower(last)))
+        #connection = self.pool.get_connection()
+        cursor = self.connection.execute (get_person_query_by_name.format(str.lower(first), str.lower(last)))
         person = Person (cursor.fetchall()[0])
-        self.pool.close_connection(connection)
+        #self.pool.close_connection(connection)
         return person
 
     def get_person_by_id(self, id_num):
-        connection = self.pool.get_connection()
-        cursor = connection.execute (get_person_query_by_id.format(id_num))
+        #connection = self.pool.get_connection()
+        cursor = self.connection.execute (get_person_query_by_id.format(id_num))
         person = Person (cursor.fetchall ()[0])
-        self.pool.close_connection(connection)
+        #self.pool.close_connection(connection)
         return person
 
     def add_person(self,person):
-        connection = self.pool.get_connection()
-        connection.execute (insert_person_query.format(
+        #connection = self.pool.get_connection()
+        self.connection.execute (insert_person_query.format(
         person.id_number,person.first_name,person.last_name,person.email,person.phone_number))
-        connection.commit()
-        self.pool.close_connection(connection)
+        self.connection.commit()
+        #self.pool.close_connection(connection)

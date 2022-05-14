@@ -102,34 +102,35 @@
          <property name="minimumSize">
           <size>
            <width>240</width>
-           <height>600</height>
+           <height>0</height>
           </size>
          </property>
-         <property name="maximumSize">
-          <size>
-           <width>240</width>
-           <height>16777215</height>
-          </size>
+         <property name="styleSheet">
+          <string notr="true">background: transparent;</string>
          </property>
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents">
+         <widget class="QWidget" name="scrollAreaWidgetContents_2">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>240</width>
-            <height>599</height>
+            <width>238</width>
+            <height>616</height>
            </rect>
           </property>
           <property name="minimumSize">
            <size>
-            <width>240</width>
+            <width>0</width>
             <height>0</height>
            </size>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
+          <property name="styleSheet">
+           <string notr="true">background: transparent;
+</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout">
            <property name="spacing">
             <number>0</number>
            </property>
@@ -146,11 +147,34 @@
             <number>0</number>
            </property>
            <item>
-            <layout class="QVBoxLayout" name="right_pic_layout">
-             <property name="spacing">
-              <number>0</number>
+            <widget class="QFrame" name="frame_2">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
              </property>
-            </layout>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <layout class="QVBoxLayout" name="right_pic_layout"/>
+              </item>
+             </layout>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -204,7 +228,7 @@
             <x>0</x>
             <y>0</y>
             <width>1100</width>
-            <height>608</height>
+            <height>618</height>
            </rect>
           </property>
           <property name="maximumSize">

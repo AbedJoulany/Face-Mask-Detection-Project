@@ -12,7 +12,6 @@ imagesFolder = r"savedImages"
 
 class PicturesThread (QThread):
     page_pixmap_signal = Signal (np.ndarray,str)
-    side_pixmap_signal = Signal (np.ndarray,str)
 
     def __init__(self,q,threadLock):
         super ().__init__ ()
@@ -21,10 +20,6 @@ class PicturesThread (QThread):
         self.threadLock = threadLock
 
     def run(self):
-        img_lst = os.listdir(imagesFolder)  # returns list
-        for img in img_lst:
-            cv_img = cv2.imread(imagesFolder + '/' + img, cv2.IMREAD_COLOR)
-            self.page_pixmap_signal.emit(cv_img, '')
         while self._run_flag:
             if not self.q.empty():
                 try:

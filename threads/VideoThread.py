@@ -18,21 +18,17 @@ class VideoThread (QThread):
     def run(self):
         # capture from web cam
         counter = 0
-        try:
-            while self._run_flag:
-                cv_img = self.read_img()
-                try:
-                    frame = getFrame (cv_img, counter, self.q, self.threadLock)
-                    self.change_pixmap_signal.emit(frame)
-                except:
-                    self.cap.release()
-                    print ("exception raised")
-
-                counter += 1
-            # shut down capture system
-            self.cap.release ()
-        except Exception:
-            print ("camera not found")
+        while self._run_flag:
+            cv_img = self.read_img()
+            try:
+                frame = getFrame (cv_img, counter, self.q, self.threadLock)
+                self.change_pixmap_signal.emit(frame)
+            except:
+                self.cap.release()
+                print ("exception raised")
+            counter += 1
+        # shut down capture system
+        self.cap.release ()
 
     def stop(self):
         """Sets run flag to False and waits for thread to finish"""

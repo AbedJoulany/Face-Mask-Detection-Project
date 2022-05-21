@@ -27,6 +27,7 @@ class VideoThread (QThread):
                 except:
                     self.cap.release()
                     print ("exception raised")
+
                 counter += 1
             # shut down capture system
             self.cap.release ()

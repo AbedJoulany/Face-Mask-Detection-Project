@@ -1,4 +1,5 @@
-# import the necessary packages
+# ----------------------------------------------------------------------------------------------------------------------
+
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras.layers import AveragePooling2D
@@ -16,6 +17,8 @@ from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import train_test_split
 import numpy as np
 import os
+
+# ----------------------------------------------------------------------------------------------------------------------
 
 INIT_LR = 1e-4
 EPOCHS = 1000
@@ -100,3 +103,5 @@ predIdxs = np.argmax(predIdxs, axis=1)
 
 # serialize the model to disk
 model.save("mask_detector.model", save_format="h5")
+
+# ----------------------------------------------------------------------------------------------------------------------

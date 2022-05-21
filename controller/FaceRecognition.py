@@ -1,19 +1,25 @@
+# ----------------------------------------------------------------------------------------------------------------------
+
 import face_recognition
 import cv2
 import os
-import glob
 import numpy as np
-from functools import cache
-import time
 
 
-class SimpleFacerec:
+# ----------------------------------------------------------------------------------------------------------------------
+
+class FaceRecognition:
+
+    # ------------------------------------------------------------------------------------------------------------------
+
     def __init__(self):
         self.known_face_encodings = []
         self.known_face_names = []
 
         # Resize frame for a faster speed
         self.frame_resizing = 0.25
+
+    # ------------------------------------------------------------------------------------------------------------------
 
     def load_encoding_images(self, images_path):
         """
@@ -33,18 +39,16 @@ class SimpleFacerec:
 
         print("Encoding images loaded")
 
-    def detect_known_faces(self, frame, location_tuple):
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def detect_known_faces(self, frame):
         # # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
         rgb_small_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        start = time.time()
-        face_locations = face_recognition.face_locations(rgb_small_frame, model='hog')
         face_encodings = \
-            face_recognition.face_encodings(rgb_small_frame, model="small", known_face_locations=face_locations)
-        end = time.time()
+            face_recognition.face_encodings(rgb_small_frame, model="small")
 
         face_distances = face_recognition.face_distance(self.known_face_encodings, face_encodings[0])
-        print(end - start)
         name = "Unknown"
 
         if face_distances.size > 0:
@@ -53,3 +57,5 @@ class SimpleFacerec:
             if matches[best_match_index]:
                 name = self.known_face_names[best_match_index]
         return name
+
+# ----------------------------------------------------------------------------------------------------------------------

@@ -1,29 +1,34 @@
-# import the necessary packages
+# ----------------------------------------------------------------------------------------------------------------------
+
+import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
 import numpy as np
-import imutils
 import cv2
-import math
-
-from typing_extensions import runtime
-
-from controller.simple_facerec import SimpleFacerec
 from concurrent.futures import ThreadPoolExecutor
-from controller.simple_facerec import SimpleFacerec
-import threading
+from controller.FaceRecognition import FaceRecognition
 
-prototxtPath = r"face_detector\deploy.prototxt"
-weightsPath = r"face_detector\res10_300x300_ssd_iter_140000.caffemodel"
+# ----------------------------------------------------------------------------------------------------------------------
+
+prototxtPath = "face_detector/deploy.prototxt"
+weightsPath = "face_detector/res10_300x300_ssd_iter_140000.caffemodel"
 maskNet = load_model("./controller/mask_detector.model")
 FacesImagesFolder = r"savedImages/Faces"
 FullImagesFolder = r"savedImages/FullImages"
 pool = ThreadPoolExecutor(max_workers=1)
+sfr = FaceRecognition()
+sfr.load_encodings()
+#sfr.load_encoding_images("controller/images")
 
-sfr = SimpleFacerec()
-sfr.load_encoding_images("controller/images")
+# ---------------------
+mouth_cascade = cv2.CascadeClassifier('./controller/cascades/haarcascade_mcs_mouth.xml')
+nose_cascade = cv2.CascadeClassifier('./controller/cascades/haarcascade_mcs_nose.xml')
 
+
+# ----------------------------------------------------------------------------------------------------------------------
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
     (h, w) = frame.shape[:2]
@@ -62,10 +67,12 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
     return (locs, preds)
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+
 def getFrame(frame, counter, q, threadLock):
     faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 
-    #frame = imutils.resize(frame, width=400)
+    # frame = imutils.resize(frame, width=400)
     frame = cv2.flip(frame, 1)
     (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
 
@@ -76,9 +83,17 @@ def getFrame(frame, counter, q, threadLock):
         label = "No Mask" if mask > withoutMask else "Mask"
         color = (0, 0, 255) if label == "No Mask" else (0, 255, 0)
 
+        # ---------------
+        # TODO: change!!, just for checking
+        if label == "Mask":
+            if mouth_detected(frame[startY:endY, startX:endX]) :
+                label = "No Mask"
+                color = (0, 0, 255)
+        # ---------------
+
         if label == "No Mask" and counter % 2 == 0:
             # making a thread for face recognition
-            pool.submit(run_rec, frame, q, threadLock, startX, startY, endX, endY)
+            pool.submit(run_rec, frame[startY:endY, startX:endX], q, threadLock)
 
         label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
 
@@ -88,12 +103,25 @@ def getFrame(frame, counter, q, threadLock):
     return frame
 
 
-def run_rec(frame, q, thread_lock, startX, startY, endX, endY):
-    tuple1 = (startY, endX, endY, startX)
-    face_name = sfr.detect_known_faces(cv2.resize(frame, (0, 0), fx=0.25, fy=0.25), tuple1)
+# ----------------------------------------------------------------------------------------------------------------------
+
+def run_rec(frame, q, thread_lock):
+    face_name = sfr.detect_known_faces(cv2.resize(frame, (0, 0), fx=0.25, fy=0.25))
     try:
         thread_lock.acquire()
-        q.put((frame[startY:endY, startX:endX], face_name))
+        q.put((frame, face_name))
         thread_lock.release()
     except:
         print("thread error")
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+def mouth_detected(frame):
+    gray = cv2.cvtColor (frame, cv2.COLOR_BGR2GRAY)
+    mouth_rects = mouth_cascade.detectMultiScale (gray, 1.7, 11)
+    return len (mouth_rects) != 0
+
+def nose_detected(frame):
+    gray = cv2.cvtColor (frame, cv2.COLOR_BGR2GRAY)
+    nose_rects = nose_cascade.detectMultiScale (gray, 1.7, 11)
+    return len (nose_rects) != 0

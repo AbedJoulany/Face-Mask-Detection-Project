@@ -7,11 +7,10 @@ dao.get_person_by_name('abedallah','joulany')"""
 import sqlite3
 import os.path
 
-
-BASE_DIR = os.path.dirname (os.path.abspath ("face_mask.db"))
-db_path = os.path.join (BASE_DIR, "face_mask.db")
+BASE_DIR = os.path.dirname(os.path.abspath("face_mask.db"))
+db_path = os.path.join(BASE_DIR, "face_mask.db")
 conn = sqlite3.connect(db_path)
-print ("Opened database successfully")
+print("Opened database successfully")
 
 """conn.execute('''CREATE TABLE IF NOT EXISTS person
 (
@@ -28,4 +27,4 @@ conn.commit()"""
 cursor = conn.execute('SELECT * FROM person')
 for row in cursor:
     print(row)
-conn.close ()
+conn.close()

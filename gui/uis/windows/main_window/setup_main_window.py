@@ -2,32 +2,25 @@
 
 # IMPORT PACKAGES AND MODULES
 # ///////////////////////////////////////////////////////////////
-from gui.widgets.py_table_widget.py_table_widget import PyTableWidget
+from database.personDaoImpl import PersonDaoImpl
+from database.Person import Person
 from . functions_main_window import *
-import sys
-import os
-
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
 from qt_core import *
-
 # IMPORT SETTINGS
 # ///////////////////////////////////////////////////////////////
 from gui.core.json_settings import Settings
-
 # IMPORT THEME COLORS
 # ///////////////////////////////////////////////////////////////
 from gui.core.json_themes import Themes
-
 # IMPORT PY ONE DARK WIDGETS
 # ///////////////////////////////////////////////////////////////
 from gui.widgets import *
-
 # LOAD UI MAIN
 # ///////////////////////////////////////////////////////////////
 from . ui_main import *
-
-# MAIN FUNCTIONS 
+# MAIN FUNCTIONS
 # ///////////////////////////////////////////////////////////////
 from . functions_main_window import *
 
@@ -41,6 +34,7 @@ class SetupMainWindow:
         # ///////////////////////////////////////////////////////////////
         self.ui = UI_MainWindow()
         self.ui.setup_ui(self)
+        self.files = [str]
 
     # ADD LEFT MENUS
     # ///////////////////////////////////////////////////////////////
@@ -63,38 +57,13 @@ class SetupMainWindow:
             "is_active" : False
         },
         {
-            "btn_icon" : "icon_info.svg",
-            "btn_id" : "btn_info",
-            "btn_text" : "Information",
-            "btn_tooltip" : "Open informations",
-            "show_top" : False,
-            "is_active" : False
+            "btn_icon": "icon_add_user.svg",
+            "btn_id": "btn_add_person",
+            "btn_text": "Add Person",
+            "btn_tooltip": "Add person",
+            "show_top": True,
+            "is_active": False
         },
-        {
-            "btn_icon" : "icon_settings.svg",
-            "btn_id" : "btn_settings",
-            "btn_text" : "Settings",
-            "btn_tooltip" : "Open settings",
-            "show_top" : False,
-            "is_active" : False
-        }
-    ]
-
-     # ADD TITLE BAR MENUS
-    # ///////////////////////////////////////////////////////////////
-    add_title_bar_menus = [
-        {
-            "btn_icon" : "icon_search.svg",
-            "btn_id" : "btn_search",
-            "btn_tooltip" : "Search",
-            "is_active" : False
-        },
-        {
-            "btn_icon" : "icon_settings.svg",
-            "btn_id" : "btn_top_settings",
-            "btn_tooltip" : "Top settings",
-            "is_active" : False
-        }
     ]
 
     # SETUP CUSTOM BTNs OF CUSTOM WIDGETS
@@ -105,8 +74,8 @@ class SetupMainWindow:
             return self.ui.title_bar.sender()
         elif self.ui.left_menu.sender() != None:
             return self.ui.left_menu.sender()
-        elif self.ui.left_column.sender() != None:
-            return self.ui.left_column.sender()
+        elif self.ui.load_pages.row_3_layout.sender() != None:
+            return self.ui.load_pages.row_3_layout.sender()
 
     # SETUP MAIN WINDOW WITH CUSTOM PARAMETERS
     # ///////////////////////////////////////////////////////////////
@@ -142,55 +111,6 @@ class SetupMainWindow:
         self.ui.left_menu.clicked.connect(self.btn_clicked)
         self.ui.left_menu.released.connect(self.btn_released)
 
-        # TITLE BAR / ADD EXTRA BUTTONS
-        # ///////////////////////////////////////////////////////////////
-        # ADD MENUS
-        self.ui.title_bar.add_menus(SetupMainWindow.add_title_bar_menus)
-
-        # SET SIGNALS
-        self.ui.title_bar.clicked.connect(self.btn_clicked)
-        self.ui.title_bar.released.connect(self.btn_released)
-
-        # ADD Title
-        if self.settings["custom_title_bar"]:
-            self.ui.title_bar.set_title(self.settings["app_name"])
-        else:
-            self.ui.title_bar.set_title("Welcome to PyOneDark")
-
-        # LEFT COLUMN SET SIGNALS
-        # ///////////////////////////////////////////////////////////////
-        self.ui.left_column.clicked.connect(self.btn_clicked)
-        self.ui.left_column.released.connect(self.btn_released)
-
-        # SET INITIAL PAGE / SET LEFT AND RIGHT COLUMN MENUS
-        # ///////////////////////////////////////////////////////////////
-        MainFunctions.set_page(self, self.ui.load_pages.page_1)
-        MainFunctions.set_left_column_menu(
-            self,
-            menu = self.ui.left_column.menus.menu_1,
-            title = "Settings Left Column",
-            icon_path = Functions.set_svg_icon("icon_settings.svg")
-        )
-        MainFunctions.set_right_column_menu(self, self.ui.right_column.menu_1)
-
-        # ///////////////////////////////////////////////////////////////
-        # EXAMPLE CUSTOM WIDGETS
-        # Here are added the custom widgets to pages and columns that
-        # were created using Qt Designer.
-        # This is just an example and should be deleted when creating
-        # your application.
-        #
-        # OBJECTS FOR LOAD PAGES, LEFT AND RIGHT COLUMNS
-        # You can access objects inside Qt Designer projects using
-        # the objects below:
-        #
-        # <OBJECTS>
-        # LEFT COLUMN: self.ui.left_column.menus
-        # RIGHT COLUMN: self.ui.right_column
-        # LOAD PAGES: self.ui.load_pages
-        # </OBJECTS>
-        # ///////////////////////////////////////////////////////////////
-
         # LOAD SETTINGS
         # ///////////////////////////////////////////////////////////////
         settings = Settings()
@@ -201,14 +121,126 @@ class SetupMainWindow:
         themes = Themes()
         self.themes = themes.items
 
-        # LEFT COLUMN
+        # page 3 - database
         # ///////////////////////////////////////////////////////////////
+        # PY LINE EDIT
+        self.line_fisrt_name = PyLineEdit (
+            text="",
+            place_holder_text="First name",
+            radius=8,
+            border_size=3,
+            color=self.themes["app_color"]["text_foreground"],
+            selection_color=self.themes["app_color"]["white"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_active=self.themes["app_color"]["dark_three"],
+            context_color=self.themes["app_color"]["context_color"]
+        )
+        self.line_fisrt_name.setMinimumHeight (40)
 
+        self.line_last_name = PyLineEdit (
+            text="",
+            place_holder_text="Last name",
+            radius=8,
+            border_size=3,
+            color=self.themes["app_color"]["text_foreground"],
+            selection_color=self.themes["app_color"]["white"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_active=self.themes["app_color"]["dark_three"],
+            context_color=self.themes["app_color"]["context_color"]
+        )
+        self.line_last_name.setMinimumHeight (40)
 
+        self.line_id = PyLineEdit (
+            text="",
+            place_holder_text="id",
+            radius=8,
+            border_size=3,
+            color=self.themes["app_color"]["text_foreground"],
+            selection_color=self.themes["app_color"]["white"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_active=self.themes["app_color"]["dark_three"],
+            context_color=self.themes["app_color"]["context_color"]
+        )
+        self.line_id.setMinimumHeight (40)
 
-        # ///////////////////////////////////////////////////////////////
-        # END - EXAMPLE CUSTOM WIDGETS
-        # ///////////////////////////////////////////////////////////////
+        self.line_email = PyLineEdit (
+            text="",
+            place_holder_text="Email",
+            radius=8,
+            border_size=3,
+            color=self.themes["app_color"]["text_foreground"],
+            selection_color=self.themes["app_color"]["white"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_active=self.themes["app_color"]["dark_three"],
+            context_color=self.themes["app_color"]["context_color"]
+        )
+        self.line_email.setMinimumHeight (40)
+
+        self.line_phone_number = PyLineEdit (
+            text="",
+            place_holder_text="Phone number",
+            radius=8,
+            border_size=3,
+            color=self.themes["app_color"]["text_foreground"],
+            selection_color=self.themes["app_color"]["white"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_active=self.themes["app_color"]["dark_three"],
+            context_color=self.themes["app_color"]["context_color"]
+        )
+        self.line_phone_number.setMinimumHeight (40)
+        self.line_phone_number.setMaximumWidth (637)
+
+        def dialog():
+            self.files, check = QFileDialog.getOpenFileNames(None, "Open files",
+                                                       "images", "Image files (*.jpg *.jpeg, *png)")
+
+        # PUSH BUTTON 1
+        self.button_choose_images = PyPushButton (
+            text="Choose images",
+            radius=8,
+            color=self.themes["app_color"]["text_foreground"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_hover=self.themes["app_color"]["dark_three"],
+            bg_color_pressed=self.themes["app_color"]["dark_four"]
+        )
+        self.button_choose_images.setMinimumHeight (40)
+        self.button_choose_images.clicked.connect(dialog)
+
+        # Add Person BUTTON
+        self.button_add_person = PyIconButton (
+            icon_path=Functions.set_svg_icon ("icon_add_user.svg"),
+            parent=self,
+            app_parent=self.ui.central_widget,
+            tooltip_text="add person",
+            width=40,
+            height=40,
+            radius=8,
+            dark_one=self.themes["app_color"]["dark_one"],
+            icon_color=self.themes["app_color"]["icon_color"],
+            icon_color_hover=self.themes["app_color"]["icon_hover"],
+            icon_color_pressed=self.themes["app_color"]["white"],
+            icon_color_active=self.themes["app_color"]["icon_active"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_hover=self.themes["app_color"]["dark_three"],
+            bg_color_pressed=self.themes["app_color"]["context_color"],
+        )
+
+        # TODO: must validate inputs
+        def print_text():
+            dao = PersonDaoImpl()
+            dao.add_person(Person([self.line_id.text(),self.line_fisrt_name.text(),
+                                  self.line_last_name.text(), self.line_email.text(),self.line_phone_number.text()]),
+                                  self.files)
+
+        self.button_add_person.clicked.connect(print_text)
+        # ADD WIDGETS
+        self.ui.load_pages.row_1_layout.addWidget(self.line_fisrt_name)
+        self.ui.load_pages.row_1_layout.addWidget(self.line_last_name)
+        self.ui.load_pages.row_2_layout.addWidget(self.line_id)
+        self.ui.load_pages.row_2_layout.addWidget(self.line_email)
+        self.ui.load_pages.row_3_layout.addWidget(self.line_phone_number)
+        self.ui.load_pages.row_3_layout.addWidget(self.button_choose_images)
+        self.ui.load_pages.row_3_layout.addWidget(self.button_add_person)
 
     # RESIZE GRIPS AND CHANGE POSITION
     # Resize or change position when window is resized

@@ -184,6 +184,12 @@ class MainWindow(QMainWindow):
             self.ui.left_menu.select_only_one(btn.objectName())
             # Load Page 2
             MainFunctions.set_page(self, self.ui.load_pages.page_2)
+        # Add person Button
+        if btn.objectName () == "btn_add_person":
+            # Select Menu
+            self.ui.left_menu.select_only_one (btn.objectName ())
+            # Load Page 3
+            MainFunctions.set_page (self, self.ui.load_pages.page_3)
             # DEBUG
         print(f"Button {btn.objectName()}, clicked!")
 

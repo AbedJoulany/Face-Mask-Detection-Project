@@ -12,6 +12,7 @@ class Person:
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, args):
+        print(args)
         self.id_number = args[0]
         self.first_name = args[1]
         self.last_name = args[2]
@@ -19,6 +20,13 @@ class Person:
         self.phone_number = args[4]
 
     # ------------------------------------------------------------------------------------------------------------------
+
+    def __str__(self):
+        return f'id:{self.id_number}, name: {self.first_name} {self.last_name},' \
+               f' email: {self.email}, phone: {self.phone_number}\n'
+
+    # ------------------------------------------------------------------------------------------------------------------
+
 
     def get_id(self):
         return self.id_number

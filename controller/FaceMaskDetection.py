@@ -20,7 +20,12 @@ FacesImagesFolder = r"savedImages/Faces"
 FullImagesFolder = r"savedImages/FullImages"
 pool = ThreadPoolExecutor(max_workers=1)
 sfr = FaceRecognition()
-sfr.load_encoding_images("controller/images")
+sfr.load_encodings()
+#sfr.load_encoding_images("controller/images")
+
+# ---------------------
+mouth_cascade = cv2.CascadeClassifier('./controller/cascades/haarcascade_mcs_mouth.xml')
+nose_cascade = cv2.CascadeClassifier('./controller/cascades/haarcascade_mcs_nose.xml')
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -78,6 +83,14 @@ def getFrame(frame, counter, q, threadLock):
         label = "No Mask" if mask > withoutMask else "Mask"
         color = (0, 0, 255) if label == "No Mask" else (0, 255, 0)
 
+        # ---------------
+        # TODO: change!!, just for checking
+        if label == "Mask":
+            if mouth_detected(frame[startY:endY, startX:endX]) :
+                label = "No Mask"
+                color = (0, 0, 255)
+        # ---------------
+
         if label == "No Mask" and counter % 2 == 0:
             # making a thread for face recognition
             pool.submit(run_rec, frame[startY:endY, startX:endX], q, threadLock)
@@ -102,3 +115,13 @@ def run_rec(frame, q, thread_lock):
         print("thread error")
 
 # ----------------------------------------------------------------------------------------------------------------------
+
+def mouth_detected(frame):
+    gray = cv2.cvtColor (frame, cv2.COLOR_BGR2GRAY)
+    mouth_rects = mouth_cascade.detectMultiScale (gray, 1.7, 11)
+    return len (mouth_rects) != 0
+
+def nose_detected(frame):
+    gray = cv2.cvtColor (frame, cv2.COLOR_BGR2GRAY)
+    nose_rects = nose_cascade.detectMultiScale (gray, 1.7, 11)
+    return len (nose_rects) != 0

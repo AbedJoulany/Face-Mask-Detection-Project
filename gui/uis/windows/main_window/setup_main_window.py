@@ -2,6 +2,8 @@
 
 # IMPORT PACKAGES AND MODULES
 # ///////////////////////////////////////////////////////////////
+from database.personDaoImpl import PersonDaoImpl
+from database.Person import Person
 from . functions_main_window import *
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
@@ -32,6 +34,7 @@ class SetupMainWindow:
         # ///////////////////////////////////////////////////////////////
         self.ui = UI_MainWindow()
         self.ui.setup_ui(self)
+        self.files = [str]
 
     # ADD LEFT MENUS
     # ///////////////////////////////////////////////////////////////
@@ -53,6 +56,14 @@ class SetupMainWindow:
             "show_top" : True,
             "is_active" : False
         },
+        {
+            "btn_icon": "icon_add_user.svg",
+            "btn_id": "btn_add_person",
+            "btn_text": "Add Person",
+            "btn_tooltip": "Add person",
+            "show_top": True,
+            "is_active": False
+        },
     ]
 
     # SETUP CUSTOM BTNs OF CUSTOM WIDGETS
@@ -63,6 +74,8 @@ class SetupMainWindow:
             return self.ui.title_bar.sender()
         elif self.ui.left_menu.sender() != None:
             return self.ui.left_menu.sender()
+        elif self.ui.load_pages.row_3_layout.sender() != None:
+            return self.ui.load_pages.row_3_layout.sender()
 
     # SETUP MAIN WINDOW WITH CUSTOM PARAMETERS
     # ///////////////////////////////////////////////////////////////
@@ -107,6 +120,127 @@ class SetupMainWindow:
         # ///////////////////////////////////////////////////////////////
         themes = Themes()
         self.themes = themes.items
+
+        # page 3 - database
+        # ///////////////////////////////////////////////////////////////
+        # PY LINE EDIT
+        self.line_fisrt_name = PyLineEdit (
+            text="",
+            place_holder_text="First name",
+            radius=8,
+            border_size=3,
+            color=self.themes["app_color"]["text_foreground"],
+            selection_color=self.themes["app_color"]["white"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_active=self.themes["app_color"]["dark_three"],
+            context_color=self.themes["app_color"]["context_color"]
+        )
+        self.line_fisrt_name.setMinimumHeight (40)
+
+        self.line_last_name = PyLineEdit (
+            text="",
+            place_holder_text="Last name",
+            radius=8,
+            border_size=3,
+            color=self.themes["app_color"]["text_foreground"],
+            selection_color=self.themes["app_color"]["white"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_active=self.themes["app_color"]["dark_three"],
+            context_color=self.themes["app_color"]["context_color"]
+        )
+        self.line_last_name.setMinimumHeight (40)
+
+        self.line_id = PyLineEdit (
+            text="",
+            place_holder_text="id",
+            radius=8,
+            border_size=3,
+            color=self.themes["app_color"]["text_foreground"],
+            selection_color=self.themes["app_color"]["white"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_active=self.themes["app_color"]["dark_three"],
+            context_color=self.themes["app_color"]["context_color"]
+        )
+        self.line_id.setMinimumHeight (40)
+
+        self.line_email = PyLineEdit (
+            text="",
+            place_holder_text="Email",
+            radius=8,
+            border_size=3,
+            color=self.themes["app_color"]["text_foreground"],
+            selection_color=self.themes["app_color"]["white"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_active=self.themes["app_color"]["dark_three"],
+            context_color=self.themes["app_color"]["context_color"]
+        )
+        self.line_email.setMinimumHeight (40)
+
+        self.line_phone_number = PyLineEdit (
+            text="",
+            place_holder_text="Phone number",
+            radius=8,
+            border_size=3,
+            color=self.themes["app_color"]["text_foreground"],
+            selection_color=self.themes["app_color"]["white"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_active=self.themes["app_color"]["dark_three"],
+            context_color=self.themes["app_color"]["context_color"]
+        )
+        self.line_phone_number.setMinimumHeight (40)
+        self.line_phone_number.setMaximumWidth (637)
+
+        def dialog():
+            self.files, check = QFileDialog.getOpenFileNames(None, "Open files",
+                                                       "images", "Image files (*.jpg *.jpeg, *png)")
+
+        # PUSH BUTTON 1
+        self.button_choose_images = PyPushButton (
+            text="Choose images",
+            radius=8,
+            color=self.themes["app_color"]["text_foreground"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_hover=self.themes["app_color"]["dark_three"],
+            bg_color_pressed=self.themes["app_color"]["dark_four"]
+        )
+        self.button_choose_images.setMinimumHeight (40)
+        self.button_choose_images.clicked.connect(dialog)
+
+        # Add Person BUTTON
+        self.button_add_person = PyIconButton (
+            icon_path=Functions.set_svg_icon ("icon_add_user.svg"),
+            parent=self,
+            app_parent=self.ui.central_widget,
+            tooltip_text="add person",
+            width=40,
+            height=40,
+            radius=8,
+            dark_one=self.themes["app_color"]["dark_one"],
+            icon_color=self.themes["app_color"]["icon_color"],
+            icon_color_hover=self.themes["app_color"]["icon_hover"],
+            icon_color_pressed=self.themes["app_color"]["white"],
+            icon_color_active=self.themes["app_color"]["icon_active"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_hover=self.themes["app_color"]["dark_three"],
+            bg_color_pressed=self.themes["app_color"]["context_color"],
+        )
+
+        # TODO: must validate inputs
+        def print_text():
+            dao = PersonDaoImpl()
+            dao.add_person(Person([self.line_id.text(),self.line_fisrt_name.text(),
+                                  self.line_last_name.text(), self.line_email.text(),self.line_phone_number.text()]),
+                                  self.files)
+
+        self.button_add_person.clicked.connect(print_text)
+        # ADD WIDGETS
+        self.ui.load_pages.row_1_layout.addWidget(self.line_fisrt_name)
+        self.ui.load_pages.row_1_layout.addWidget(self.line_last_name)
+        self.ui.load_pages.row_2_layout.addWidget(self.line_id)
+        self.ui.load_pages.row_2_layout.addWidget(self.line_email)
+        self.ui.load_pages.row_3_layout.addWidget(self.line_phone_number)
+        self.ui.load_pages.row_3_layout.addWidget(self.button_choose_images)
+        self.ui.load_pages.row_3_layout.addWidget(self.button_add_person)
 
     # RESIZE GRIPS AND CHANGE POSITION
     # Resize or change position when window is resized

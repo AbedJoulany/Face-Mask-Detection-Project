@@ -12,7 +12,7 @@ class VideoThread(QThread):
     change_pixmap_signal = Signal(np.ndarray)
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __init__(self, q, threadLock):
+    def __init__(self, q, threadLock, sfr):
         super().__init__()
         self.q = q
         self._run_flag = True
@@ -20,6 +20,7 @@ class VideoThread(QThread):
         self.cap = cv2.VideoCapture(0)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1290)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 592)
+        self.sfr = sfr
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +30,7 @@ class VideoThread(QThread):
         while self._run_flag:
             cv_img = self.read_img()
             try:
-                frame = getFrame(cv_img, counter, self.q, self.threadLock)
+                frame = getFrame(self.sfr, cv_img, counter, self.q, self.threadLock)
                 self.change_pixmap_signal.emit(frame)
             except:
                 self.cap.release()

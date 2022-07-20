@@ -2,6 +2,8 @@
 
 # IMPORT PACKAGES AND MODULES
 # ///////////////////////////////////////////////////////////////
+import threading
+
 from database.personDaoImpl import PersonDaoImpl
 from database.Person import Person
 from . functions_main_window import *
@@ -23,9 +25,10 @@ from . ui_main import *
 # MAIN FUNCTIONS
 # ///////////////////////////////////////////////////////////////
 from . functions_main_window import *
-
+from concurrent.futures import ThreadPoolExecutor
 # PY WINDOW
 # ///////////////////////////////////////////////////////////////
+pool = ThreadPoolExecutor(max_workers=1)
 class SetupMainWindow:
     def __init__(self):
         super().__init__()
@@ -79,7 +82,7 @@ class SetupMainWindow:
 
     # SETUP MAIN WINDOW WITH CUSTOM PARAMETERS
     # ///////////////////////////////////////////////////////////////
-    def setup_gui(self):
+    def setup_gui(self,sfr):
         # APP TITLE
         # ///////////////////////////////////////////////////////////////
         self.setWindowTitle(self.settings["app_name"])
@@ -226,13 +229,13 @@ class SetupMainWindow:
         )
 
         # TODO: must validate inputs
-        def print_text():
-            dao = PersonDaoImpl()
+        def add_to_db():
+            dao = PersonDaoImpl(sfr)
             dao.add_person(Person([self.line_id.text(),self.line_fisrt_name.text(),
                                   self.line_last_name.text(), self.line_email.text(),self.line_phone_number.text()]),
                                   self.files)
 
-        self.button_add_person.clicked.connect(print_text)
+        self.button_add_person.clicked.connect(add_to_db)
         # ADD WIDGETS
         self.ui.load_pages.row_1_layout.addWidget(self.line_fisrt_name)
         self.ui.load_pages.row_1_layout.addWidget(self.line_last_name)

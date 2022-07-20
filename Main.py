@@ -2,6 +2,7 @@
 
 # IMPORT PACKAGES AND MODULES
 # ///////////////////////////////////////////////////////////////
+from controller.FaceRecognition import FaceRecognition
 from gui.uis.windows.main_window.functions_main_window import *
 import sys
 import cv2
@@ -72,22 +73,30 @@ class MainWindow(QMainWindow):
         settings = Settings()
         self.settings = settings.items
 
+        # load encodings
+        ###########################################################
+
+        self.sfr = FaceRecognition()
+        self.dao = PersonDaoImpl(self.sfr)
+        self.sfr.load_encodings(self.dao.getPersonAndEncodings())
+
         # SETUP MAIN WINDOW
         # ///////////////////////////////////////////////////////////////
         self.hide_grips = True  # Show/Hide resize grips
-        SetupMainWindow.setup_gui(self)
+        SetupMainWindow.setup_gui(self,self.sfr)
+
 
         ###########################################################
         q = Queue()
         # create the video capture thread
-        self.thread = VideoThread(q, threadLock)
+        self.thread = VideoThread(q, threadLock, self.sfr)
         self.thread1 = PicturesThread(q, threadLock)
 
         # connect its signal to the update_image slot
         self.thread.change_pixmap_signal.connect(self.update_image)
         self.thread1.page_pixmap_signal.connect(self.add_image_to_page)
         ###########################################################
-        self.dao = PersonDaoImpl()
+
         # ///////////////////////////////////////////////////////////////
         self.i = 0
         self.j = -1

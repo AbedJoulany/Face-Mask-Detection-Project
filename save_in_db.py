@@ -19,6 +19,22 @@ db_path = os.path.join(BASE_DIR, "face_mask.db")
 conn = sqlite3.connect(db_path)
 print("Opened database successfully")
 
+create_person_table = '''CREATE TABLE IF NOT EXISTS person
+  (id_number INT UNSIGNED PRIMARY KEY NOT NULL UNIQUE,
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL ,
+  email TEXT NOT NULL UNIQUE,
+  phone_number TEXT NOT NULL UNIQUE
+  );
+  '''
+create_encoding_table = '''CREATE TABLE IF NOT EXISTS encoding
+  (
+  encode TEXT NOT NULL,
+  id_number INT UNSIGNED NOT NULL,
+  FOREIGN KEY (id_number) REFERENCES person (id_number)
+  );
+  '''
+
 arr = numpy.array([-0.10213576,  0.05088161, -0.03425048, -0.09622347, -0.12966095,
         0.04867411, -0.00511892, -0.03418527,  0.2254715 , -0.07892745,
         0.21497472, -0.0245543 , -0.2127848 , -0.08542262, -0.00298059,
@@ -46,37 +62,43 @@ arr = numpy.array([-0.10213576,  0.05088161, -0.03425048, -0.09622347, -0.129660
         0.02722404, -0.06028951, -0.19448066, -0.07304715,  0.0204969 ,
        -0.03045784, -0.02818791,  0.06679841])
 
-conn.execute('''CREATE TABLE IF NOT EXISTS perso
-(id_number INT UNSIGNED PRIMARY KEY NOT NULL UNIQUE,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL ,
-  email TEXT NOT NULL UNIQUE,
-  phone_number TEXT NOT NULL UNIQUE,
-  encode TEXT NOT NULL);
-  ''')
+conn.execute(create_person_table)
+conn.execute(create_encoding_table)
 
 str_two_d = []
 str_list = [str(x) for x in arr]
 str_two_d.append(str_list)
 str_two_d.append(str_list)
 
-"""print(json.dumps(str_two_d))
-conn.execute ('INSERT INTO perso (id_number, first_name, last_name, email, phone_number,encode)'
-              ' VALUES(?,?,?,?,?,?);',("123","abed","jou","mabed@edu.hac.ac.il","052848614",json.dumps(str_two_d)))
+#print(json.dumps(str_two_d))
+"""conn.execute ('INSERT INTO person (id_number, first_name, last_name, email, phone_number)'
+              ' VALUES(?,?,?,?,?);',("123","abed","jou","mabed@edu.hac.ac.il","052848614"))"""
+
+"""for i in str_two_d:
+    conn.execute('INSERT INTO encoding (id_number, encode)'
+             ' VALUES(?,?);',("123",json.dumps(i)))
+
 conn.commit()"""
 
 
-"""cursor = conn.execute('SELECT * FROM perso')
+cursor = conn.execute('SELECT first_name, last_name, encode FROM person natural join encoding')
 for row in cursor:
-    print(row)
-    enodes = json.loads(row[2])
+    print (row)
+    #encodes = json.loads(row[2])
+    #l = [numpy.float64 (x) for x in encodes]
+
+"""    enodes = json.loads(row[2])
     for col in enodes:
         l = [numpy.float64 (x) for x in col]
         print(l)"""
 
-#conn.close()
 
-sql = 'drop table perso'
+sql = 'drop table person'
+sql2 = 'drop table encoding'
 cur = conn.cursor()
+cur.execute(sql2)
 cur.execute(sql)
 conn.commit()
+
+
+conn.close()

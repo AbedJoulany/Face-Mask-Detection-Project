@@ -7,9 +7,8 @@ import numpy
 import cv2
 import face_recognition
 from controller.FaceRecognition import FaceRecognition
-from threads.wrapper_pool import wrapper_pool
 # ----------------------------------------------------------------------------------------------------------------------
-pool = ThreadPoolExecutor(max_workers=1)
+#thread_pool = ThreadPoolExecutor(max_workers=1)
 
 
 get_person_query_by_name = 'SELECT * FROM person where first_name = "{}" and last_name = "{}";'
@@ -67,12 +66,13 @@ class PersonDaoImpl(object):
 
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, sfr):
+    def __init__(self, sfr, thread_pool):
         self.pool = Connection_pool()
         self.connection = self.pool.get_connection()
         self.connection.execute(create_person_table)
         self.connection.execute(create_encoding_table)
         self.sfr = sfr
+        self.thread_pool = thread_pool
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -97,7 +97,7 @@ class PersonDaoImpl(object):
         self.connection.commit ()
         name = person.first_name + ' ' + person.last_name
 
-        pool.submit(insert_encoding,self.sfr, self.pool, name, person.id_number,images)
+        self.thread_pool.submit(insert_encoding,self.sfr, self.pool, name, person.id_number,images)
 
 
     def getPersonAndEncodings(self):

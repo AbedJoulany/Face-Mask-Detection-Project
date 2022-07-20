@@ -18,6 +18,7 @@ from datetime import datetime
 
 persons_dict = {}
 threadLock = threading.Lock()
+thread_pool = ThreadPoolExecutor(max_workers=1)
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -77,19 +78,19 @@ class MainWindow(QMainWindow):
         ###########################################################
 
         self.sfr = FaceRecognition()
-        self.dao = PersonDaoImpl(self.sfr)
+        self.dao = PersonDaoImpl(self.sfr,thread_pool)
         self.sfr.load_encodings(self.dao.getPersonAndEncodings())
 
         # SETUP MAIN WINDOW
         # ///////////////////////////////////////////////////////////////
         self.hide_grips = True  # Show/Hide resize grips
-        SetupMainWindow.setup_gui(self,self.sfr)
+        SetupMainWindow.setup_gui(self,self.sfr,thread_pool)
 
 
         ###########################################################
         q = Queue()
         # create the video capture thread
-        self.thread = VideoThread(q, threadLock, self.sfr)
+        self.thread = VideoThread(q, threadLock, self.sfr, thread_pool)
         self.thread1 = PicturesThread(q, threadLock)
 
         # connect its signal to the update_image slot

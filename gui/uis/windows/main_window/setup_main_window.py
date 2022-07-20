@@ -82,7 +82,7 @@ class SetupMainWindow:
 
     # SETUP MAIN WINDOW WITH CUSTOM PARAMETERS
     # ///////////////////////////////////////////////////////////////
-    def setup_gui(self,sfr):
+    def setup_gui(self, sfr, thread_pool):
         # APP TITLE
         # ///////////////////////////////////////////////////////////////
         self.setWindowTitle(self.settings["app_name"])
@@ -230,7 +230,7 @@ class SetupMainWindow:
 
         # TODO: must validate inputs
         def add_to_db():
-            dao = PersonDaoImpl(sfr)
+            dao = PersonDaoImpl(sfr, thread_pool)
             dao.add_person(Person([self.line_id.text(),self.line_fisrt_name.text(),
                                   self.line_last_name.text(), self.line_email.text(),self.line_phone_number.text()]),
                                   self.files)

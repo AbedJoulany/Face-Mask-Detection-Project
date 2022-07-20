@@ -10,6 +10,7 @@ import numpy as np
 import cv2
 from concurrent.futures import ThreadPoolExecutor
 from controller.FaceRecognition import FaceRecognition
+from threads.wrapper_pool import wrapper_pool
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -18,9 +19,10 @@ weightsPath = "face_detector/res10_300x300_ssd_iter_140000.caffemodel"
 maskNet = load_model("./controller/mask_detector.model")
 FacesImagesFolder = r"savedImages/Faces"
 FullImagesFolder = r"savedImages/FullImages"
+
 pool = ThreadPoolExecutor(max_workers=1)
-sfr = FaceRecognition()
-sfr.load_encodings()
+#sfr = FaceRecognition()
+#sfr.load_encodings()
 #sfr.load_encoding_images("controller/images")
 
 # ---------------------
@@ -69,7 +71,7 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-def getFrame(frame, counter, q, threadLock):
+def getFrame(sfr :FaceRecognition, frame, counter, q, threadLock):
     faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 
     # frame = imutils.resize(frame, width=400)
@@ -93,7 +95,7 @@ def getFrame(frame, counter, q, threadLock):
 
         if label == "No Mask" and counter % 2 == 0:
             # making a thread for face recognition
-            pool.submit(run_rec, frame[startY:endY, startX:endX], q, threadLock)
+            pool.submit(run_rec, sfr, frame[startY:endY, startX:endX], q, threadLock)
 
         label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
 
@@ -105,7 +107,7 @@ def getFrame(frame, counter, q, threadLock):
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-def run_rec(frame, q, thread_lock):
+def run_rec(sfr, frame, q, thread_lock):
     face_name = sfr.detect_known_faces(cv2.resize(frame, (0, 0), fx=0.25, fy=0.25))
     try:
         thread_lock.acquire()

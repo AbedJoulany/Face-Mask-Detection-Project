@@ -6,8 +6,6 @@ import os
 import numpy as np
 
 # ----------------------------------------------------------------------------------------------------------------------
-from database.personDaoImpl import *
-
 
 class FaceRecognition:
 
@@ -16,11 +14,15 @@ class FaceRecognition:
     def __init__(self):
         self.known_face_encodings = []
         self.known_face_names = []
-
         # Resize frame for a faster speed
         self.frame_resizing = 0.25
 
     # ------------------------------------------------------------------------------------------------------------------
+    def append_known_face_encoding(self, encoding):
+        self.known_face_encodings.append(encoding)
+
+    def append_known_face_names(self, name):
+        self.known_face_names.append(name)
 
     def load_encoding_images(self, images_path):
         """
@@ -41,12 +43,7 @@ class FaceRecognition:
         print ("Encoding images loaded")
 
     # ------------------------------------------------------------------------------------------------------------------
-    def load_encodings(self):
-        """
-        :return:
-        """
-        dao = PersonDaoImpl ()
-        name_encoding = dao.getPersonAndEncodings ()
+    def load_encodings(self, name_encoding):
         for name, encoding in name_encoding:
             self.known_face_encodings.append (encoding)
             self.known_face_names.append (name)

@@ -12,7 +12,6 @@ class Person:
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, args):
-        print(args)
         self.id_number = args[0]
         self.first_name = args[1]
         self.last_name = args[2]

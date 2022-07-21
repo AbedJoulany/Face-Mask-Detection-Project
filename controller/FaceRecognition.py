@@ -55,7 +55,7 @@ class FaceRecognition:
         rgb_small_frame = cv2.cvtColor (frame, cv2.COLOR_BGR2RGB)
 
         face_encodings = \
-            face_recognition.face_encodings (rgb_small_frame, model="small")
+            face_recognition.face_encodings (rgb_small_frame, model="hog")
 
         face_distances = face_recognition.face_distance (self.known_face_encodings, face_encodings[0])
         name = "Unknown"

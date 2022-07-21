@@ -93,7 +93,7 @@ def getFrame(sfr :FaceRecognition, thread_pool, frame, counter, q, threadLock):
                 color = (0, 0, 255)
         # ---------------
 
-        if label == "No Mask" and counter % 2 == 0:
+        if label == "No Mask":
             # making a thread for face recognition
             thread_pool.submit(run_rec, sfr, frame[startY:endY, startX:endX], q, threadLock)
 
@@ -108,7 +108,7 @@ def getFrame(sfr :FaceRecognition, thread_pool, frame, counter, q, threadLock):
 # ----------------------------------------------------------------------------------------------------------------------
 
 def run_rec(sfr, frame, q, thread_lock):
-    face_name = sfr.detect_known_faces(cv2.resize(frame, (0, 0), fx=0.25, fy=0.25))
+    face_name = sfr.detect_known_faces(frame)
     try:
         thread_lock.acquire()
         q.put((frame, face_name))

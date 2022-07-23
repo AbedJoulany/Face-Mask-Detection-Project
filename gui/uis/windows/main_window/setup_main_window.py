@@ -223,9 +223,9 @@ class SetupMainWindow:
                     # scaling the image
                     img = qt_img.scaled (300, 300, Qt.KeepAspectRatio)
                     object.setPixmap (img)
-                    self.grid_pictures.addWidget(object,*(x,y%3))
+                    self.grid_pictures.addWidget(object,*(x,y%5))
                     y += 1
-                    if y % 3 == 0:
+                    if y % 5 == 0:
                         x += 1
 
         # PUSH BUTTON 1
@@ -326,8 +326,8 @@ class SetupMainWindow:
         self.ui.load_pages.row_3_layout.addWidget(self.button_choose_images)
         self.ui.load_pages.row_3_layout.addWidget(self.button_add_person)
         self.ui.load_pages.row_3_layout.addWidget(self.button_clear_fields)
-        self.ui.load_pages.row_4_layout.addLayout(self.grid_pictures)
-        self.ui.load_pages.row_5_layout.addWidget(self.button_reset_database)
+        self.ui.load_pages.row_4_layout.addWidget(self.button_reset_database)
+        self.ui.load_pages.row_5_layout.addLayout(self.grid_pictures)
 
     # RESIZE GRIPS AND CHANGE POSITION
     # Resize or change position when window is resized

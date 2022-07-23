@@ -73,8 +73,10 @@ class PersonDaoImpl(object):
 
     def get_person_by_name(self, first, last):
         cursor = self.connection.execute(get_person_query_by_name.format(str.lower(first), str.lower(last)))
-        person = Person(cursor.fetchall()[0])
-        return person
+        result = cursor.fetchall()
+        if not result:
+            return Person(['Unknown', 'Person', ' ', ' ', ' '])
+        return Person(result[0])
 
     # ------------------------------------------------------------------------------------------------------------------
 

@@ -4,7 +4,8 @@ import face_recognition
 import cv2
 import os
 import numpy as np
-
+last_encoding = []
+scale_percent = 50
 # ----------------------------------------------------------------------------------------------------------------------
 
 class FaceRecognition:
@@ -34,30 +35,20 @@ class FaceRecognition:
 
     def detect_known_faces(self, frame):
         # # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
-        rgb_small_frame = cv2.cvtColor (frame, cv2.COLOR_BGR2RGB)
-
-        face_encodings = \
-            face_recognition.face_encodings (rgb_small_frame, model="hog")
-
-        face_distances = face_recognition.face_distance (self.known_face_encodings, face_encodings[0])
         name = ("Unknown", '')
-
-        face_recognition.face_encodings(rgb_small_frame, num_jitters=2, known_face_locations=[(0, frame.shape[1], frame.shape[0], 0)],
-                                            model="hog")
-        print("3")
+        rgb_small_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        face_encodings = \
+            face_recognition.face_encodings(rgb_small_frame, num_jitters=3,
+                                            known_face_locations=[(0, frame.shape[1], frame.shape[0], 0)],
+                                            model="large")
         face_distances = face_recognition.face_distance(self.known_face_encodings, face_encodings[0])
-        print("4")
         if face_distances.size > 0:
-            best_match_index = np.argmin (face_distances)
-            matches = face_recognition.compare_faces (self.known_face_encodings, face_encodings[0],tolerance=0.5)
+            best_match_index = np.argmin(face_distances)
+            matches = face_recognition.compare_faces(self.known_face_encodings, face_encodings[0], tolerance=0.5)
             if matches[best_match_index]:
-                print("7")
-                print(matches.count(True))
                 name = self.known_face_names[best_match_index]
                 if name == ("Unknown", ''):
                     return None
-                """if self.countTrue(matches, self.find_indices(self.known_face_names, self.known_face_names[
-                    best_match_index])) > self.known_face_names.count(self.known_face_names[best_match_index]) // 2:"""
                 return name
             else:
                 self.known_face_encodings.append(face_encodings[0])
@@ -67,22 +58,5 @@ class FaceRecognition:
             self.known_face_encodings.append(face_encodings[0])
             self.known_face_names.append(("Unknown", ''))
             return ("Unknown", '')
-
-
-    def find_indices(self, list_to_check, item_to_find):
-        indices = []
-        for idx, value in enumerate(list_to_check):
-            if value == item_to_find:
-                indices.append(idx)
-        print(indices)
-        return indices
-
-    def countTrue(self, matches, indecies):
-        count = 0
-        for i in indecies:
-            if matches[i]:
-                count += 1
-        print(count)
-        return count
 
 # ----------------------------------------------------------------------------------------------------------------------

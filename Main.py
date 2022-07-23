@@ -45,6 +45,7 @@ os.environ["QT_FONT_DPI"] = "96"
 # MAIN WINDOW
 # ///////////////////////////////////////////////////////////////
 def check_data(name):
+    print(name)
     if name[0] == "Unknown":
         return 1
     now = datetime.now()

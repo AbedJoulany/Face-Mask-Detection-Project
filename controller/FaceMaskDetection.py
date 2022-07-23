@@ -110,6 +110,8 @@ def getFrame(sfr: FaceRecognition, thread_pool, frame, counter, q, threadLock):
 def run_rec(sfr, frame, q, thread_lock):
     face_name = sfr.detect_known_faces(frame)
     print(face_name)
+    if face_name is None:
+        return
     try:
         thread_lock.acquire()
         q.put((frame, face_name))

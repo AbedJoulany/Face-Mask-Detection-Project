@@ -47,7 +47,7 @@ def insert_encoding(sfr: FaceRecognition, pool, name, id, images: [str]):
     for img in images:
         image = cv2.imread (img)
         rgb_img = cv2.cvtColor (image, cv2.COLOR_BGR2RGB)
-        encoding = face_recognition.face_encodings (rgb_img, model="small")[0]
+        encoding = face_recognition.face_encodings(rgb_img, model="hog", num_jitters=50)[0]
         str_list = [str (x) for x in encoding]
         connection.execute ('INSERT INTO encoding (id_number, encode)\
          VALUES(?,?);', (id, json.dumps (str_list)))
@@ -72,10 +72,11 @@ class PersonDaoImpl(object):
     # ------------------------------------------------------------------------------------------------------------------
 
     def get_person_by_name(self, first, last):
-        print(first,last)
         cursor = self.connection.execute(get_person_query_by_name.format(str.lower(first), str.lower(last)))
-        person = Person(cursor.fetchall()[0])
-        return person
+        result = cursor.fetchall()
+        if not result:
+            return Person(['Unknown', 'Person', ' ', ' ', ' '])
+        return Person(result[0])
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -103,7 +104,6 @@ class PersonDaoImpl(object):
         cursor = self.connection.execute (get_person_query_by_name_encoding)
         for row in cursor:
             name = row[0] + ' ' + row[1]
-            #print(name)
             enodes = json.loads(row[2])
             l = [numpy.float64 (x) for x in enodes]
             name_encoding.append (((row[0],row[1]), l))

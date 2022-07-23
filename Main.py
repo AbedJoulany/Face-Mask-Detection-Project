@@ -13,7 +13,7 @@ from picBox import *
 from queue import Queue
 import threading
 from datetime import datetime
-
+from PySide6.QtGui import *
 # ----------------------------------------------------------------------------------------------------------------------
 
 persons_dict = {}
@@ -24,7 +24,8 @@ thread_pool = ThreadPoolExecutor(max_workers=1)
 
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
-from qt_core import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
 
 # IMPORT SETTINGS
 # ///////////////////////////////////////////////////////////////
@@ -44,6 +45,7 @@ os.environ["QT_FONT_DPI"] = "96"
 # MAIN WINDOW
 # ///////////////////////////////////////////////////////////////
 def check_data(name):
+    print(name)
     if name[0] == "Unknown":
         return 1
     now = datetime.now()

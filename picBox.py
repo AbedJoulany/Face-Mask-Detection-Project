@@ -1,6 +1,8 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
-from qt_core import *
+
+from PySide6.QtWidgets import *
+
 from database.personDaoImpl import *
 from messages.ChatPot import send_email
 

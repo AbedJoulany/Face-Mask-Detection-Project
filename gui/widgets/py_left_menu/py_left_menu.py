@@ -1,7 +1,7 @@
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
-from qt_core import *
-
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
 # IMPORT BUTTON AND DIV
 # ///////////////////////////////////////////////////////////////
 from . py_left_menu_button import PyLeftMenuButton

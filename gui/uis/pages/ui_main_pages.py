@@ -8,8 +8,9 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 from PyQt5.QtWidgets import QLabel as QtLabel
-
-from qt_core import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 
 
 class Ui_MainPages (object):
@@ -172,6 +173,7 @@ class Ui_MainPages (object):
         # row 4
         self.row_4_layout = QHBoxLayout ()
         self.row_4_layout.setObjectName (u"row_4_layout")
+        self.row_4_layout.setAlignment (Qt.AlignLeft)
         self.verticalLayout.addLayout (self.row_4_layout)
         # row 5
         self.row_5_layout = QHBoxLayout ()

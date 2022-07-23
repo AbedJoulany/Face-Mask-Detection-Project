@@ -1,7 +1,8 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import cv2
-from qt_core import *
+from PySide6.QtCore import *
+
 import numpy as np
 from controller.FaceMaskDetection import getFrame
 
@@ -17,7 +18,7 @@ class VideoThread(QThread):
         self.q = q
         self._run_flag = True
         self.threadLock = threadLock
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(cv2.CAP_V4L2)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1290)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 592)
         self.sfr = sfr
@@ -52,7 +53,7 @@ class VideoThread(QThread):
     def get_cap(self) -> cv2.VideoCapture:
         while not self.cap.isOpened():
             self.change_pixmap_signal.emit(cv2.imread("gui/images/no_cam.png"))
-            self.cap = cv2.VideoCapture(0)
+            self.cap = cv2.VideoCapture(cv2.CAP_V4L2)
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1290)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 592)
         return self.cap
@@ -64,5 +65,9 @@ class VideoThread(QThread):
         if not ret1:
             self.cap.release()
         return cv_img
+
+    @staticmethod
+    def rel():
+        VideoThread.cap.release()
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
-from qt_core import *
-
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
 # IMPORT FUNCTIONS
 # ///////////////////////////////////////////////////////////////
 from gui.core.functions import *

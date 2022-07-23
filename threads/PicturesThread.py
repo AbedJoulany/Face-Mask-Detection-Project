@@ -9,7 +9,7 @@ import numpy as np
 # ----------------------------------------------------------------------------------------------------------------------
 
 class PicturesThread(QThread):
-    page_pixmap_signal = Signal(np.ndarray, str)
+    page_pixmap_signal = Signal(np.ndarray, tuple)
 
     # ------------------------------------------------------------------------------------------------------------------
     def __init__(self, q, threadLock):

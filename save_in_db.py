@@ -81,7 +81,9 @@ str_two_d.append(str_list)
 conn.commit()"""
 
 
-cursor = conn.execute('SELECT first_name, last_name, encode FROM person natural join encoding')
+#cursor = conn.execute('SELECT first_name, last_name, encode FROM person natural join encoding')
+cursor = conn.execute('SELECT * FROM person where first_name = "abedallah" and last_name = "joulany";')
+print(cursor.fetchall())
 for row in cursor:
     print (row)
     #encodes = json.loads(row[2])
@@ -93,12 +95,12 @@ for row in cursor:
         print(l)"""
 
 
-sql = 'drop table person'
+"""sql = 'drop table person'
 sql2 = 'drop table encoding'
 cur = conn.cursor()
 cur.execute(sql2)
 cur.execute(sql)
-conn.commit()
+conn.commit()"""
 
 
 conn.close()

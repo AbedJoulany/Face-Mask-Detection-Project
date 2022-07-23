@@ -9,27 +9,32 @@ from messages.ChatPot import send_email
 # ----------------------------------------------------------------------------------------------------------------------
 
 persons_dict = {}
-#dao = PersonDaoImpl()
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-class picBox(QWidget):
+class picBox(QFrame):
 
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, parent,  *args, **kwargs):
+        super().__init__(parent,*args, **kwargs)
+
+        self.setStyleSheet(frame_style)
         self.verticalLayout = QVBoxLayout(self)
+
         self.image = QLabel(self)
+        #self.image.setStyleSheet(style)
         self.name = QLabel(self)
         self.email = QLabel(self)
         self.phone_number = QLabel(self)
-        self.time = QLabel(self)
+
         self.verticalLayout.addWidget(self.image)
         self.verticalLayout.addWidget(self.name)
         self.verticalLayout.addWidget(self.email)
         self.verticalLayout.addWidget(self.phone_number)
+
+
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -39,16 +44,30 @@ class picBox(QWidget):
     # ------------------------------------------------------------------------------------------------------------------
 
     def set_data(self, name, dao: PersonDaoImpl, cv_img):
-        if name != "Unknown":
-            n = name.split(' ')
-            person = dao.get_person_by_name(n[0], n[1])
-            self.name.setText(name)
+        fullname = name[0] + ' ' + name[1]
+        if fullname.rstrip() != "Unknown":
+            person = dao.get_person_by_name(name[0], name[1])
+            self.name.setText(fullname)
             self.email.setText(person.email)
             self.phone_number.setText(person.phone_number)
-            send_email(name, person.email, cv_img)
+            send_email(fullname, person.email, cv_img)
             return
-        self.name.setText(name)
+        self.name.setText(fullname)
         self.email.setText("")
         self.phone_number.setText("")
 
 # ----------------------------------------------------------------------------------------------------------------------
+
+style = '''
+QLabel{
+    border: 2px solid green;
+    border-radius: 4px;
+    padding: 2px;
+    }
+'''
+
+frame_style = '''
+QFrame{
+background-color:rgb(33, 37, 45);
+}
+'''

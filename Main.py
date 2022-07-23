@@ -1,5 +1,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
+
+
 # IMPORT PACKAGES AND MODULES
 # ///////////////////////////////////////////////////////////////
 from controller.FaceRecognition import FaceRecognition
@@ -13,7 +15,7 @@ from picBox import *
 from queue import Queue
 import threading
 from datetime import datetime
-
+from PySide6.QtGui import *
 # ----------------------------------------------------------------------------------------------------------------------
 
 persons_dict = {}
@@ -24,7 +26,8 @@ thread_pool = ThreadPoolExecutor(max_workers=1)
 
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
-from qt_core import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
 
 # IMPORT SETTINGS
 # ///////////////////////////////////////////////////////////////
@@ -78,14 +81,13 @@ class MainWindow(QMainWindow):
         ###########################################################
 
         self.sfr = FaceRecognition()
-        self.dao = PersonDaoImpl(self.sfr,thread_pool)
+        self.dao = PersonDaoImpl(self.sfr, thread_pool)
         self.sfr.load_encodings(self.dao.getPersonAndEncodings())
 
         # SETUP MAIN WINDOW
         # ///////////////////////////////////////////////////////////////
         self.hide_grips = True  # Show/Hide resize grips
-        SetupMainWindow.setup_gui(self,self.sfr,thread_pool)
-
+        SetupMainWindow.setup_gui(self, self.sfr, thread_pool)
 
         ###########################################################
         q = Queue()
@@ -195,13 +197,13 @@ class MainWindow(QMainWindow):
             # Load Page 2
             MainFunctions.set_page(self, self.ui.load_pages.page_2)
         # Add person Button
-        if btn.objectName () == "btn_add_person":
+        if btn.objectName() == "btn_add_person":
             # Select Menu
-            self.ui.left_menu.select_only_one (btn.objectName ())
+            self.ui.left_menu.select_only_one(btn.objectName())
             # Load Page 3
-            MainFunctions.set_page (self, self.ui.load_pages.page_3)
+            MainFunctions.set_page(self, self.ui.load_pages.page_3)
             # DEBUG
-        print(f"Button {btn.objectName()}, clicked!")
+        # print(f"Button {btn.objectName()}, clicked!")
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -213,7 +215,7 @@ class MainWindow(QMainWindow):
         # GET BT CLICKED
         btn = SetupMainWindow.setup_btns(self)
         # DEBUG
-        print(f"Button {btn.objectName()}, released!")
+        # print(f"Button {btn.objectName()}, released!")
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -241,9 +243,12 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("icon.ico"))
     window = MainWindow()
+    window.show()
 
     # EXEC APP
     # ///////////////////////////////////////////////////////////////
-    sys.exit(app.exec())
+
+    sys.exit(app.exec_())
+
 
 # ----------------------------------------------------------------------------------------------------------------------

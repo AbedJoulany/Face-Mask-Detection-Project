@@ -1,7 +1,8 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import time
-from qt_core import *
+from PySide6.QtCore import *
+
 import numpy as np
 
 

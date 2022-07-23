@@ -1,15 +1,17 @@
 
-
 # IMPORT PACKAGES AND MODULES
 # ///////////////////////////////////////////////////////////////
 import threading
 
 from database.personDaoImpl import PersonDaoImpl
 from database.Person import Person
+from picBox import picBox
 from . functions_main_window import *
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
-from qt_core import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 # IMPORT SETTINGS
 # ///////////////////////////////////////////////////////////////
 from gui.core.json_settings import Settings
@@ -35,9 +37,12 @@ class SetupMainWindow:
         # SETUP MAIN WINDOw
         # Load widgets from "gui\uis\main_window\ui_main.py"
         # ///////////////////////////////////////////////////////////////
+        self.image = QLabel(self)
         self.ui = UI_MainWindow()
         self.ui.setup_ui(self)
         self.files = [str]
+        self.i = 0
+        self.j = -1
 
     # ADD LEFT MENUS
     # ///////////////////////////////////////////////////////////////
@@ -79,6 +84,13 @@ class SetupMainWindow:
             return self.ui.left_menu.sender()
         elif self.ui.load_pages.row_3_layout.sender() != None:
             return self.ui.load_pages.row_3_layout.sender()
+
+    def getPos(self):
+        self.j += 1
+        if self.j % 3 == 0:
+            self.i += 1
+
+        return (self.i, self.j % 3)
 
     # SETUP MAIN WINDOW WITH CUSTOM PARAMETERS
     # ///////////////////////////////////////////////////////////////
@@ -195,7 +207,7 @@ class SetupMainWindow:
 
         def dialog():
             self.files, check = QFileDialog.getOpenFileNames(None, "Open files",
-                                                       "images", "Image files (*.jpg *.jpeg, *png)")
+                                                       "images", "Image files (*.jpg *.jpeg *.png)")
 
         # PUSH BUTTON 1
         self.button_choose_images = PyPushButton (
@@ -228,12 +240,20 @@ class SetupMainWindow:
             bg_color_pressed=self.themes["app_color"]["context_color"],
         )
 
-        # TODO: must validate inputs
+        def clean_fields():
+            self.line_id.clear()
+            self.line_fisrt_name.clear()
+            self.line_last_name.clear()
+            self.line_email.clear()
+            self.line_phone_number.clear()
+            self.files.clear()
+
         def add_to_db():
             dao = PersonDaoImpl(sfr, thread_pool)
-            dao.add_person(Person([self.line_id.text(),self.line_fisrt_name.text(),
-                                  self.line_last_name.text(), self.line_email.text(),self.line_phone_number.text()]),
-                                  self.files)
+            dao.add_person(Person([self.line_id.text() ,self.line_fisrt_name.text(),
+                                  self.line_last_name.text(), self.line_email.text() ,self.line_phone_number.text()]),
+                                  [i for i in self.files])
+            clean_fields()
 
         self.button_add_person.clicked.connect(add_to_db)
         # ADD WIDGETS

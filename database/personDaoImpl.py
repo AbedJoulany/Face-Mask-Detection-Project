@@ -1,5 +1,6 @@
 # ----------------------------------------------------------------------------------------------------------------------
 from concurrent.futures import ThreadPoolExecutor
+from threads.VideoThread import VideoThread
 from database.ConnectionPool import *
 from database.Person import Person
 import json
@@ -7,6 +8,7 @@ import numpy
 import cv2
 import face_recognition
 from controller.FaceRecognition import FaceRecognition
+import base64
 # ----------------------------------------------------------------------------------------------------------------------
 #thread_pool = ThreadPoolExecutor(max_workers=1)
 
@@ -40,21 +42,15 @@ create_encoding_table = '''CREATE TABLE IF NOT EXISTS encoding
 
 
 def insert_encoding(sfr: FaceRecognition, pool, name, id, images: [str]):
-
     connection = pool.get_connection()
-    print("after getting connection")
+
     for img in images:
         image = cv2.imread (img)
-        print("reading image")
         rgb_img = cv2.cvtColor (image, cv2.COLOR_BGR2RGB)
-        print("before encoding")
-        encoding = face_recognition.face_encodings (rgb_img, model="small")[0]
-        print("after encoding")
+        encoding = face_recognition.face_encodings(rgb_img, model="hog", num_jitters=50)[0]
         str_list = [str (x) for x in encoding]
-        print("after str_list")
         connection.execute ('INSERT INTO encoding (id_number, encode)\
          VALUES(?,?);', (id, json.dumps (str_list)))
-        print("encoded")
         sfr.append_known_face_names(name)
         sfr.append_known_face_encoding(encoding)
     connection.commit ()
@@ -91,9 +87,9 @@ class PersonDaoImpl(object):
     # ------------------------------------------------------------------------------------------------------------------
 
     def add_person(self, person,images:[str]):
-        self.connection.execute (insert_person_query.format
-                            (person.id_number, person.first_name, person.last_name, person.email,
-                             person.phone_number))
+        self.connection.execute(insert_person_query.format
+                                (person.id_number, person.first_name, person.last_name, person.email,
+                                 person.phone_number))
         self.connection.commit ()
         name = person.first_name + ' ' + person.last_name
 

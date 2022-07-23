@@ -8,8 +8,9 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 from PyQt5.QtWidgets import QLabel as QtLabel
-
-from qt_core import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 
 
 class Ui_MainPages (object):
@@ -90,7 +91,7 @@ class Ui_MainPages (object):
         self.page_2_layout.setContentsMargins (5, 5, 5, 5)
         self.scroll_area = QScrollArea (self.page_2)
         self.scroll_area.setObjectName (u"scroll_area")
-        self.scroll_area.setMaximumSize (QSize (1100, 16777215))
+        self.scroll_area.setMaximumSize (QSize (1400, 16777215))
         self.scroll_area.setStyleSheet (u"background: transparent;")
         self.scroll_area.setFrameShape (QFrame.NoFrame)
         self.scroll_area.setVerticalScrollBarPolicy (Qt.ScrollBarAlwaysOff)
@@ -98,14 +99,14 @@ class Ui_MainPages (object):
         self.scroll_area.setWidgetResizable (True)
         self.contents = QWidget ()
         self.contents.setObjectName (u"contents")
-        self.contents.setGeometry (QRect (0, 0, 1100, 618))
-        self.contents.setMaximumSize (QSize (1100, 16777215))
+        self.contents.setGeometry (QRect (0, 0, 1400, 618))
+        self.contents.setMaximumSize (QSize (1400, 16777215))
         self.contents.setStyleSheet (u"background: transparent;")
         self.gridLayout = QGridLayout (self.contents)
         self.gridLayout.setObjectName (u"gridLayout")
         self.frame = QFrame (self.contents)
         self.frame.setObjectName (u"frame")
-        self.frame.setMaximumSize (QSize (1200, 16777215))
+        self.frame.setMaximumSize (QSize (1400, 16777215))
         self.frame.setFrameShape (QFrame.StyledPanel)
         self.frame.setFrameShadow (QFrame.Raised)
         self.gridLayout_3 = QGridLayout (self.frame)
@@ -113,7 +114,7 @@ class Ui_MainPages (object):
         self.gridLayout_3.setObjectName (u"gridLayout_3")
         self.gridLayout_3.setContentsMargins (0, 0, 0, 0)
         self.gridLayout_2 = QGridLayout ()
-        self.gridLayout_2.setSpacing (25)
+        self.gridLayout_2.setSpacing (50)
         self.gridLayout_2.setObjectName (u"gridLayout_2")
         self.gridLayout_2.setContentsMargins (6, -1, 6, -1)
 
@@ -143,6 +144,7 @@ class Ui_MainPages (object):
         self.scroll_area.setHorizontalScrollBarPolicy (Qt.ScrollBarAlwaysOff)
         self.scroll_area.setWidgetResizable (True)
         self.contents = QWidget ()
+
         self.contents.setObjectName (u"contents")
         self.contents.setGeometry (QRect (0, 0, 840, 580))
         self.contents.setStyleSheet (u"background: transparent;")

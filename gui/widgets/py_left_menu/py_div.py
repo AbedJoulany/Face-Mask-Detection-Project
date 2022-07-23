@@ -1,7 +1,9 @@
 # There are limitations on Qt licenses if you want to use your products
 # IMPORT QT CORE
 # ///////////////////////////////////////////////////////////////
-from qt_core import *
+
+from PySide6.QtWidgets import *
+
 
 # CUSTOM LEFT MENU
 # ///////////////////////////////////////////////////////////////

@@ -26,7 +26,6 @@ def email_alert(subject, body, to, cv_img):
     byte = io.BytesIO()
     pil_im.save(byte, 'jpeg')
     im_bytes = byte.getvalue()
-    print("img type", type(im_bytes))
     image = MIMEImage(im_bytes)
     text = MIMEText(body)
     msg.attach(text)

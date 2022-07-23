@@ -44,7 +44,7 @@ os.environ["QT_FONT_DPI"] = "96"
 # MAIN WINDOW
 # ///////////////////////////////////////////////////////////////
 def check_data(name):
-    if name == "Unknown":
+    if name[0] == "Unknown":
         return 1
     now = datetime.now()
     if name not in persons_dict:
@@ -140,7 +140,7 @@ class MainWindow(QMainWindow):
         if check != 4:
             qt_img = self.convert_cv_qt(cv_img)
             object = QLabel()
-            box = picBox()
+            box = picBox(self.ui.load_pages.contents)
             # scaling the image
             qt_img = qt_img.scaled(300, 300, Qt.KeepAspectRatio)
             box.setImage(qt_img)
@@ -201,7 +201,7 @@ class MainWindow(QMainWindow):
             # Load Page 3
             MainFunctions.set_page (self, self.ui.load_pages.page_3)
             # DEBUG
-        print(f"Button {btn.objectName()}, clicked!")
+        #print(f"Button {btn.objectName()}, clicked!")
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -213,7 +213,7 @@ class MainWindow(QMainWindow):
         # GET BT CLICKED
         btn = SetupMainWindow.setup_btns(self)
         # DEBUG
-        print(f"Button {btn.objectName()}, released!")
+        #print(f"Button {btn.objectName()}, released!")
 
     # ------------------------------------------------------------------------------------------------------------------
 

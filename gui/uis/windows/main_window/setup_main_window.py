@@ -27,6 +27,7 @@ from . ui_main import *
 from . functions_main_window import *
 from concurrent.futures import ThreadPoolExecutor
 # PY WINDOW
+import cv2
 # ///////////////////////////////////////////////////////////////
 pool = ThreadPoolExecutor(max_workers=1)
 class SetupMainWindow:
@@ -193,9 +194,38 @@ class SetupMainWindow:
         self.line_phone_number.setMinimumHeight (40)
         self.line_phone_number.setMaximumWidth (637)
 
+
+
         def dialog():
+
+            def convert_cv_qt(cv_img):
+                """Convert from an opencv image to QPixmap"""
+                rgb_image = cv2.cvtColor (cv_img, cv2.COLOR_BGR2RGB)
+                h, w, ch = rgb_image.shape
+                bytes_per_line = ch * w
+                convert_to_qt_format = QImage (rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
+                p = convert_to_qt_format.scaled (self.ui.load_pages.stream.width (),
+                                                 self.ui.load_pages.stream.height (),
+                                                 Qt.KeepAspectRatio)
+                return QPixmap.fromImage (p)
+
             self.files, check = QFileDialog.getOpenFileNames(None, "Open files",
-                                                       "images", "Image files (*.jpg *.jpeg, *png)")
+                                                       "images", "Image files (*.jpg *.jpeg *.png)")
+            if len(self.files) > 0:
+                for i in reversed(range (self.grid_pictures.count ())):
+                    self.grid_pictures.itemAt (i).widget ().setParent (None)
+                x , y = 0, 0
+                for i in self.files:
+                    img = cv2.imread (i)
+                    qt_img = self.convert_cv_qt(img)
+                    object = QLabel ()
+                    # scaling the image
+                    img = qt_img.scaled (300, 300, Qt.KeepAspectRatio)
+                    object.setPixmap (img)
+                    self.grid_pictures.addWidget(object,*(x,y%3))
+                    y += 1
+                    if y % 3 == 0:
+                        x += 1
 
         # PUSH BUTTON 1
         self.button_choose_images = PyPushButton (
@@ -228,14 +258,64 @@ class SetupMainWindow:
             bg_color_pressed=self.themes["app_color"]["context_color"],
         )
 
-        # TODO: must validate inputs
+        # grid for chosen pictures
+        self.grid_pictures = QGridLayout ()
+
+        def clear_fields():
+            self.line_fisrt_name.clear()
+            self.line_last_name.clear()
+            self.line_id.clear()
+            self.line_email.clear()
+            self.line_phone_number.clear()
+            for i in reversed (range (self.grid_pictures.count ())):
+                self.grid_pictures.itemAt (i).widget ().setParent (None)
+
         def add_to_db():
             dao = PersonDaoImpl(sfr, thread_pool)
             dao.add_person(Person([self.line_id.text(),self.line_fisrt_name.text(),
                                   self.line_last_name.text(), self.line_email.text(),self.line_phone_number.text()]),
-                                  self.files)
+                                  [i for i in self.files])
+            clear_fields()
 
         self.button_add_person.clicked.connect(add_to_db)
+
+        # clear fields button
+        self.button_clear_fields = PyIconButton (
+            icon_path=Functions.set_svg_icon ("icon_close.svg"),
+            parent=self,
+            app_parent=self.ui.central_widget,
+            tooltip_text="clear all fields",
+            width=40,
+            height=40,
+            radius=8,
+            dark_one=self.themes["app_color"]["dark_one"],
+            icon_color=self.themes["app_color"]["icon_color"],
+            icon_color_hover=self.themes["app_color"]["icon_hover"],
+            icon_color_pressed=self.themes["app_color"]["white"],
+            icon_color_active=self.themes["app_color"]["icon_active"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_hover=self.themes["app_color"]["dark_three"],
+            bg_color_pressed=self.themes["app_color"]["context_color"],
+        )
+        self.button_clear_fields.clicked.connect(clear_fields)
+
+        # button to reset database
+        self.button_reset_database = PyPushButton (
+            text="Reset Database",
+            radius=8,
+            color=self.themes["app_color"]["text_foreground"],
+            bg_color=self.themes["app_color"]["dark_one"],
+            bg_color_hover=self.themes["app_color"]["dark_three"],
+            bg_color_pressed=self.themes["app_color"]["dark_four"]
+        )
+        self.button_reset_database.setMinimumHeight (40)
+        self.button_reset_database.setMinimumWidth(400)
+        def reset_database():
+            dao = PersonDaoImpl (sfr, thread_pool)
+            dao.delete_tables()
+        self.button_reset_database.clicked.connect (reset_database)
+
+
         # ADD WIDGETS
         self.ui.load_pages.row_1_layout.addWidget(self.line_fisrt_name)
         self.ui.load_pages.row_1_layout.addWidget(self.line_last_name)
@@ -244,6 +324,9 @@ class SetupMainWindow:
         self.ui.load_pages.row_3_layout.addWidget(self.line_phone_number)
         self.ui.load_pages.row_3_layout.addWidget(self.button_choose_images)
         self.ui.load_pages.row_3_layout.addWidget(self.button_add_person)
+        self.ui.load_pages.row_3_layout.addWidget(self.button_clear_fields)
+        self.ui.load_pages.row_4_layout.addLayout(self.grid_pictures)
+        self.ui.load_pages.row_5_layout.addWidget(self.button_reset_database)
 
     # RESIZE GRIPS AND CHANGE POSITION
     # Resize or change position when window is resized

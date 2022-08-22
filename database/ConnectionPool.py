@@ -26,7 +26,7 @@ class Connection_pool():
     def get_connection(self):
         BASE_DIR = os.path.dirname (os.path.abspath ("face_mask.db"))
         db_path = os.path.join (BASE_DIR, "face_mask.db")
-        return sqlite3.connect("/home/mohamad/PycharmProjects/Face-Mask-Detection-Project/face_mask.db")
+        return sqlite3.connect(db_path)
 
     # ------------------------------------------------------------------------------------------------------------------
 

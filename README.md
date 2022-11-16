@@ -11,7 +11,7 @@ Hadassah academic college
 # About the project
 When the covid-19 spread, one of the ways to limit its spread was to were a mask, but not all people committed to wearing it or wearing it correctly.
 
-- In the project we decided to build a real time system to detect by a camera, person who is not wearing a mask or not wearing it correctly, and if the person is found in our database the system was abke to recognize him, it will show his details and send him a mail to wear a mask.  
+- In the project we decided to build a real time system to detect by a camera, person who is not wearing a mask or not wearing it correctly, and if the person is found in our database the system was able to recognize him, it will show his details and send him a mail to wear a mask.  
 
 # Example
 ![image](https://user-images.githubusercontent.com/59060418/200169243-03aae822-f79b-49f2-99ca-171ccb81272e.png)
@@ -24,7 +24,19 @@ When the covid-19 spread, one of the ways to limit its spread was to were a mask
 ![image](https://user-images.githubusercontent.com/59060418/200169302-38b06b9f-f2f9-4244-a51f-4d7eb2f6cb18.png)
 
 # Detection
+The detection goes through several stages
+1 - The System detect faces in picture
+  In this part we used a built-in model to detect faces
+2 - The System determines if the face is with mask or not.
+3 - The System checks if mouth or nose found in picture to determine wither person is wearing mask correctly
+  in this stage we encounterd some difficulties in determining if mask is weard correctly so that was our simple solution.
+4 - showing the result on screen.
 
+# Examples
+- Not wearing a mask
+![image](https://user-images.githubusercontent.com/59060418/202166062-c1e8aa61-a9f1-45a8-aafe-2b9590992e80.png)
+ - Wearing mask wrong
+![image](https://user-images.githubusercontent.com/59060418/202166133-3d50a790-28f0-4726-abce-de400abb6d44.png)
 
 # Recognition
 

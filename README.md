@@ -25,17 +25,18 @@ When the covid-19 spread, one of the ways to limit its spread was to were a mask
 
 # Detection
 The detection goes through several stages
-1 - The System detect faces in picture
+- The System detect faces in picture
   In this part we used a built-in model to detect faces
-2 - The System determines if the face is with mask or not.
-3 - The System checks if mouth or nose found in picture to determine wither person is wearing mask correctly
+- The System determines if the face is with mask or not.
+- The System checks if mouth or nose found in picture to determine wither person is wearing mask correctly
   in this stage we encounterd some difficulties in determining if mask is weard correctly so that was our simple solution.
-4 - showing the result on screen.
-
-# Examples
+- showing the result on screen.
 - Not wearing a mask
+
 ![image](https://user-images.githubusercontent.com/59060418/202166062-c1e8aa61-a9f1-45a8-aafe-2b9590992e80.png)
- - Wearing mask wrong
+
+- Wearing mask wrong
+
 ![image](https://user-images.githubusercontent.com/59060418/202166133-3d50a790-28f0-4726-abce-de400abb6d44.png)
 
 # Recognition

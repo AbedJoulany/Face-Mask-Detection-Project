@@ -1,11 +1,11 @@
 # REAL TIME FACE MASK DETECTION PROJECT
-Graduation project: Face mask detection based AI 
-by: 
+Graduation project: Face mask detection based AI
+by:
 Abedallah Joulany &
 Mohamad Ektelat
 Moderator:
 Sagiv Tuvia
-College: 
+College:
 Hadassah academic college
 
 # About the project

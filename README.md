@@ -49,14 +49,17 @@ The recognition goes through several stages
 # More System Features
 
 - The System have a Page to add people in real time where you can enter the details and the pictures of the person
+
 ![WhatsApp Video 2022-10-19 at 20 46 351 - frame at 0m21s](https://user-images.githubusercontent.com/59060418/202843403-b4da6588-3246-4318-ba08-875b14308b5e.jpg)
 
 - The System works on both linux and windows.
 - After a lot of research we figured out that face recognition on linux is 10x faster than windows
 - Windows results
+
 ![image](https://user-images.githubusercontent.com/59060418/202843520-e24fcec0-68b3-4041-ace8-46965aa79112.png)
 
 - Linux Results
+
 ![image](https://user-images.githubusercontent.com/59060418/202843535-a8d03612-35a3-4b82-976d-548f5ae051c7.png)
 
 # Summary
